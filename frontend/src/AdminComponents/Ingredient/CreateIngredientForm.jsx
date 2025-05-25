@@ -1,11 +1,13 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { createIngredient } from '../../components/State/Ingredients/Action';
 
 const CreateIngredientForm = () => {
+    const { restaurant, ingredient } = useSelector(store => store);
     const [formData, setFormData] = useState({
         name: '',
-        ingredientCategoryId: ''
+        categoryId: ''
     });
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("token");
@@ -13,12 +15,10 @@ const CreateIngredientForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const data = {
-            name: formData.name,
-            ingredientCategoryId: {
-                id: 1,
-            },
+            ...formData,
+            restaurantId: restaurant.usersRestaurant.id,
         };
-        
+        dispatch(createIngredient({ data: data, jwt: jwt }));
         console.log(data);
 
     }
@@ -49,14 +49,14 @@ const CreateIngredientForm = () => {
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            value={formData.ingredientCategoryId}
+                            value={formData.categoryId}
                             label="Category"
-                            name='ingredientCategoryId'
+                            name='categoryId'
+                            variant="outlined"
                             onChange={handleInputChange}
                         >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
+                            {ingredient.category.map((item) => <MenuItem value={item.id}>{item.name}</MenuItem>)}
+
                         </Select>
                     </FormControl>
 

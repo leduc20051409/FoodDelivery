@@ -85,7 +85,7 @@ export const getIngredientCategory = ({id,jwt}) => {
 export const updateStockOfIngredient = ({id,jwt}) => {
   return async (dispatch) => {
     try {
-      const {data} = await api.put(`/api/admin/ingredients/${id}/stoke`, 
+      const {data} = await api.put(`/api/admin/ingredients/${id}/stock`, 
       { },
       {
         headers: {
