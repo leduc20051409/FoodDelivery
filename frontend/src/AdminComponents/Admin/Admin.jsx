@@ -1,7 +1,7 @@
 import React, { use, useEffect } from 'react'
 import AdminSidebar from './AdminSidebar'
 import { Route, Routes, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { logOut } from '../../components/State/Authentication/Action'
 import Dashboard from '../Dashboard/DashBoard'
 import Orders from '../Orders/Orders'
@@ -15,11 +15,19 @@ import { getRestaurantsCategory } from '../../components/State/Restaurant/Action
 
 
 const Admin = () => {
-    
+    const dispatch = useDispatch();
+    const jwt = localStorage.getItem("token");
+    const { restaurant, ingredient} = useSelector(store => store);
+    const menuItems = useSelector(store => store.menu.menuItems);
     const handleClose = () => {
 
     }
-    
+
+    useEffect(() => {
+        console.log("menu", menuItems);
+
+    }, []);
+
 
     return (
         <div>

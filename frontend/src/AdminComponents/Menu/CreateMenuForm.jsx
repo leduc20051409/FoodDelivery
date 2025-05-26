@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import { Box, Button, Chip, CircularProgress, FormControl, Grid, IconButton, InputLabel, MenuItem, OutlinedInput, Select, TextField } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CloseIcon from '@mui/icons-material/Close';
 import { uploadImageToCloudinary } from '../Utils/UploadToCloudinary';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { createMenuItem } from '../../components/State/Menu/Action';
 
 const initialValues = {
     name: "",
@@ -16,7 +18,6 @@ const initialValues = {
 
     vegetarian: true,
     seasonal: false,
-    quantity: 0,
     ingredientItems: [],
 };
 const ITEM_HEIGHT = 48;
@@ -31,6 +32,9 @@ const MenuProps = {
 };
 
 const CreateMenuForm = () => {
+    const dispatch = useDispatch();
+    const jwt = localStorage.getItem("token");
+    const { restaurant, ingredient } = useSelector(store => store);
     const [uploadImage, setUploadImage] = useState(false);
     const validationSchema = Yup.object({
         email: Yup.string()
@@ -52,14 +56,15 @@ const CreateMenuForm = () => {
                 images: values.images,
                 restaurantId: values.restaurantId,
 
-                isVegetarian: values.isVegetarian,
-                isSeasonal: values.isSeasonal,
-                quantity: values.quantity,
+                isVegetarian: values.vegetarian,
+                isSeasonal: values.seasonal,
                 ingredientItems: values.ingredientItems,
             };
+            //dispatch(createMenuItem({ data, jwt }));
             console.log(data);
         },
     });
+
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         setUploadImage(true);
@@ -72,6 +77,7 @@ const CreateMenuForm = () => {
         updateimages.splice(index, 1);
         formik.setFieldValue("images", updateimages);
     }
+
 
     return (
         <div className="py-10 lg:flex items-center justify-center min-h-screen">
@@ -163,9 +169,7 @@ const CreateMenuForm = () => {
                                     name='category'
                                     onChange={formik.handleChange}
                                 >
-                                    <MenuItem value={10}>Ten</MenuItem>
-                                    <MenuItem value={20}>Twenty</MenuItem>
-                                    <MenuItem value={30}>Thirty</MenuItem>
+                                    {restaurant.categories.map((item) => <MenuItem value={item}>{item.name}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -189,16 +193,12 @@ const CreateMenuForm = () => {
                                     )}
                                     MenuProps={MenuProps}
                                 >
-                                    {['Oliver Hansen',
-                                        'Van Henry',
-                                        'April Tucker',
-                                        'Ralph Hubbard',].map((name, index) => (
+                                    {ingredient.ingredients.map((item, index) => (
                                             <MenuItem
-                                                key={name}
-                                                value={name}
-                                            // style={getStyles(name, personName, theme)}
+                                                key={item.id}
+                                                value={item}
                                             >
-                                                {name}
+                                                {item.name}
                                             </MenuItem>
                                         ))}
                                 </Select>

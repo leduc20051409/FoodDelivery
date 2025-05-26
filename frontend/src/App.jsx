@@ -16,6 +16,7 @@ import { store } from './components/State/Store'
 import { findCart } from './components/State/Cart/Action'
 import Router from './Routers/Router'
 import { getRestaurantByUserId } from './components/State/Restaurant/Action'
+import { getMenuItemsByRestaurantId } from './components/State/Menu/Action'
 
 function App() {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ function App() {
   useEffect(() => {
     dispatch(getRestaurantByUserId(jwt || auth.jwt));
   }, [auth.jwt]);
+
 
   return (
     <ThemeProvider theme={darkTheme}>

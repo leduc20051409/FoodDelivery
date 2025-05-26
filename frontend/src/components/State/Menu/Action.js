@@ -122,7 +122,7 @@ export const updateMenuItemsAvailability = ({ foodId, jwt }) => {
 export const deleteFoodAction = ({ foodId, jwt }) => async (dispatch) => {
     dispatch({ type: DELETE_MENU_ITEM_REQUEST });
     try {
-        const { data } = await api.delete(`/api/admin/food/${foodId}`, {
+        const { data } = await api.delete(`/api/admin/food/${foodId}/delete`, {
             headers: {
                 Authorization: `Bearer ${jwt}`,
             },
