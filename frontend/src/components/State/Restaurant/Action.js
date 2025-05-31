@@ -23,15 +23,11 @@ import {
     UPDATE_RESTAURANT_SUCCESS,
 } from "./ActionType";
 
-export const getAllRestaurantsAction = (token) => {
+export const getAllRestaurantsAction = () => {
     return async (dispatch) => {
         dispatch({ type: GET_ALL_RESTAURANTS_REQUEST });
         try {
-            const { data } = await api.get("/api/restaurants/all", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const { data } = await api.get("/restaurants/all");
             dispatch({ type: GET_ALL_RESTAURANTS_SUCCESS, payload: data });
             console.log("all restaurant ", data);
         } catch (error) {
@@ -44,11 +40,7 @@ export const getRestaurantById = (reqData) => {
     return async (dispatch) => {
         dispatch({ type: GET_RESTAURANT_BY_ID_REQUEST });
         try {
-            const response = await api.get(`api/restaurants/restaurant/${reqData.restaurantId}`, {
-                headers: {
-                    Authorization: `Bearer ${reqData.jwt}`,
-                },
-            });
+            const response = await api.get(`/restaurants/restaurant/${reqData.restaurantId}`);
             dispatch({ type: GET_RESTAURANT_BY_ID_SUCCESS, payload: response.data });
         } catch (error) {
             console.log("error", error)
@@ -259,15 +251,11 @@ export const createCategoryAction = ({ reqData, jwt }) => {
     };
 };
 
-export const getRestaurantsCategory = ({ jwt, restaurantId }) => {
+export const getRestaurantsCategory = ({restaurantId }) => {
     return async (dispatch) => {
         dispatch({ type: GET_RESTAURANTS_CATEGORY_REQUEST });
         try {
-            const res = await api.get(`/api/category/restaurant/${restaurantId}`, {
-                headers: {
-                    Authorization: `Bearer ${jwt}`,
-                },
-            });
+            const res = await api.get(`/category/restaurant/${restaurantId}`);
             console.log("get restaurants category ", res.data);
             dispatch({ type: GET_RESTAURANTS_CATEGORY_SUCCESS, payload: res.data });
         } catch (error) {

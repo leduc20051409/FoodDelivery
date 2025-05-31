@@ -11,7 +11,7 @@ import { deleteFoodAction } from '../../components/State/Menu/Action';
 const MenuTable = () => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("token");
-    const { restaurant, ingredient, menu } = useSelector(store => store);
+    const { restaurant, menu } = useSelector(store => store);
     const orders = [1, 1, 1, 1, 1];
     const navigate = useNavigate();
     useEffect(() => {
@@ -20,7 +20,6 @@ const MenuTable = () => {
             isVegetarian: false,
             isSeasonal: true,
             isNonVegetarian: false,
-            jwt: jwt,
             foodCategory: ""
         }));
 

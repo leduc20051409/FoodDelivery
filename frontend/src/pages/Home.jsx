@@ -13,7 +13,7 @@ const Home = () => {
     const jwt = localStorage.getItem("token");
     const { restaurant } = useSelector(store => store);
     useEffect(() => {
-        dispatch(getAllRestaurantsAction(jwt));
+        dispatch(getAllRestaurantsAction());
     }, [])
     return (
         <div className='pb-10'>

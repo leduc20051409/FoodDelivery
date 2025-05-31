@@ -44,13 +44,8 @@ export const getMenuItemsByRestaurantId = (reqData) => {
         dispatch({ type: GET_MENU_ITEMS_BY_RESTAURANT_ID_REQUEST });
         try {
             const { data } = await api.get(
-                `/api/food/restaurant/${reqData.restaurantId}?isVegetarian=${reqData.isVegetarian}&isNonVegetarian=${reqData.isNonVegetarian}
+                `/food/restaurant/${reqData.restaurantId}?isVegetarian=${reqData.isVegetarian}&isNonVegetarian=${reqData.isNonVegetarian}
         &isSeasonal=${reqData.isSeasonal}&foodCategory=${reqData.foodCategory}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${reqData.jwt}`,
-                    },
-                }
             );
             console.log("menu item by restaurants ", data);
             dispatch({ type: GET_MENU_ITEMS_BY_RESTAURANT_ID_SUCCESS, payload: data });

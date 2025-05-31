@@ -31,17 +31,20 @@ const RestaurentDetail = () => {
     const { auth, restaurant, menu } = useSelector(store => store);
     const { id, city } = useParams();
     const [selectedCategory, setSelectedCategory] = useState("");
-    console.log("restaurant", restaurant);
+    
+    useEffect(() => {
+        console.log("restaurant", restaurant);
+        console.log("restaurant categories", restaurant.categories);
+    },)
 
     useEffect(() => {
-        dispatch(getRestaurantById({ jwt, restaurantId: id }));
-        dispatch(getRestaurantsCategory({ jwt, restaurantId: id }));
-
+        dispatch(getRestaurantById({ restaurantId: id }));
+        dispatch(getRestaurantsCategory({ restaurantId: id }));
     }, []);
 
     useEffect(() => {
         dispatch(getMenuItemsByRestaurantId({
-            jwt, restaurantId: id,
+            restaurantId: id,
             isVegetarian: foodType === "vegetarian",
             isNonVegetarian: foodType === "non_vegetarian",
             isSeasonal: foodType === "seasonal",
@@ -77,7 +80,7 @@ const RestaurentDetail = () => {
                         <Grid item xs={12} lg={6} className='w-[calc(50%-15px)]'>
                             <img
                                 className='w-full h-[40vh] object-cover'
-                                src="https://images.pexels.com/photos/3201921/pexels-photo-3201921.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                                src={restaurant.restaurant?.images[2]}
                                 alt=""
                             />
                         </Grid>

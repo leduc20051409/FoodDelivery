@@ -1,11 +1,12 @@
 import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, FormControlLabel, FormGroup } from '@mui/material'
-import React, { useState } from 'react'
+import React, { use, useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { categorizeIngredient } from './Util/CategorizeIngredient';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItemToCart } from './State/Cart/Action';
 
 const MenuCard = ({ item }) => {
+    const {auth} = useSelector(store => store);
     const ingredients = [
         {
             category: "Nuts & seeds",
@@ -35,6 +36,12 @@ const MenuCard = ({ item }) => {
     const dispatch = useDispatch();
     const handleAddToCart = (e) => {
         e.preventDefault();
+
+        if (!auth.jwt) {
+            alert("Please login to add items to cart");
+            return;
+        }
+
         const reqData = {
             token: localStorage.getItem("token"),
             cartItem: {

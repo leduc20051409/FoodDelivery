@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Button } from "@mui/material";
 import CreateEventForm from "./CreateEventForm";
 import dayjs from "dayjs";
+import { useDispatch, useSelector } from "react-redux";
+import { createEventAction } from "../../components/State/Restaurant/Action";
 
 const initialValues = {
   image: "",
@@ -12,6 +14,10 @@ const initialValues = {
 };
 
 const Events = () => {
+  const dispatch = useDispatch();
+  const jwt = localStorage.getItem("token");
+  const { restaurant, restaurantOrder, ingredient, menu } = useSelector(store => store);
+
   const [openModal, setOpenModal] = useState(false);
   const [formValues, setFormValues] = useState(initialValues);
 
@@ -29,6 +35,11 @@ const Events = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    // dispatch(createEventAction({
+    //   data: formValues,
+    //   jwt: jwt,
+    //   restaurantId: restaurant.usersRestaurant.id
+    // }));
     console.log("Submitted Form Values:", formValues);
     // Optionally close and reset form:
     // setFormValues(initialValues);
