@@ -7,6 +7,8 @@ import { uploadImageToCloudinary } from '../Utils/UploadToCloudinary';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createMenuItem } from '../../components/State/Menu/Action';
+import { getIngredientCategory, getIngredientsOfRestaurant } from '../../components/State/Ingredients/Action';
+import { getRestaurantsCategory } from '../../components/State/Restaurant/Action';
 
 const initialValues = {
     name: "",
@@ -36,17 +38,9 @@ const CreateMenuForm = () => {
     const jwt = localStorage.getItem("token");
     const { restaurant, ingredient } = useSelector(store => store);
     const [uploadImage, setUploadImage] = useState(false);
-    const validationSchema = Yup.object({
-        email: Yup.string()
-            .email('Invalid email address')
-            .required('Email is required'),
-        mobile: Yup.string()
-            .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits')
-            .required('Phone number is required'),
-    });
+    
     const formik = useFormik({
         initialValues,
-        validationSchema: validationSchema,
         onSubmit: (values) => {
             const data = {
                 name: values.name,
@@ -54,16 +48,28 @@ const CreateMenuForm = () => {
                 price: values.price,
                 category: values.category,
                 images: values.images,
-                restaurantId: values.restaurantId,
+                restaurantId: restaurant.usersRestaurant.id,
 
-                isVegetarian: values.vegetarian,
-                isSeasonal: values.seasonal,
+                vegetarian: values.vegetarian,
+                seasonal: values.seasonal,
                 ingredientItems: values.ingredientItems,
             };
-            //dispatch(createMenuItem({ data, jwt }));
+            dispatch(createMenuItem({ menu: data, jwt }));
             console.log(data);
         },
     });
+
+    useEffect(() => {
+    if(restaurant.usersRestaurant) {
+        dispatch(getRestaurantsCategory({
+            restaurantId: restaurant.usersRestaurant.id,
+        }));
+        dispatch(getIngredientsOfRestaurant({
+            id: restaurant.usersRestaurant.id,
+            jwt
+        }));
+    }
+}, [restaurant.usersRestaurant]);
 
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
@@ -125,6 +131,7 @@ const CreateMenuForm = () => {
                                 </div>
                             </div>
                         </Grid>
+                        {/* Name */}
                         <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth
@@ -136,6 +143,7 @@ const CreateMenuForm = () => {
                                 value={formik.values.name}
                             />
                         </Grid>
+                        {/* Description */}
                         <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth
@@ -147,6 +155,7 @@ const CreateMenuForm = () => {
                                 value={formik.values.description}
                             />
                         </Grid>
+                        {/* Price */}
                         <Grid size={{ xs: 12, lg: 6 }}>
                             <TextField
                                 fullWidth
@@ -158,6 +167,7 @@ const CreateMenuForm = () => {
                                 value={formik.values.price}
                             />
                         </Grid>
+                        {/* Category */}
                         <Grid size={{ xs: 12, lg: 6 }}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Category</InputLabel>
@@ -169,10 +179,17 @@ const CreateMenuForm = () => {
                                     name='category'
                                     onChange={formik.handleChange}
                                 >
-                                    {restaurant.categories.map((item) => <MenuItem value={item}>{item.name}</MenuItem>)}
+                                    {restaurant.categories.map((item) =>
+                                        <MenuItem
+                                            value={item}
+                                            sx={{ zIndex: 1 }}
+                                        >
+                                            {item.name}
+                                        </MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
+                        {/* Ingredients */}
                         <Grid size={{ xs: 12 }}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-multiple-chip-label">Ingredients</InputLabel>
@@ -187,23 +204,24 @@ const CreateMenuForm = () => {
                                     renderValue={(selected) => (
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                             {selected.map((value) => (
-                                                <Chip key={value} label={value} />
+                                                <Chip key={value} label={value.name || ''} />
                                             ))}
                                         </Box>
                                     )}
                                     MenuProps={MenuProps}
                                 >
                                     {ingredient.ingredients.map((item, index) => (
-                                            <MenuItem
-                                                key={item.id}
-                                                value={item}
-                                            >
-                                                {item.name}
-                                            </MenuItem>
-                                        ))}
+                                        <MenuItem
+                                            key={item.id}
+                                            value={item}
+                                        >
+                                            {item.name}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Grid>
+                        {/* Vegetarian and seasonal */}
                         <Grid size={{ xs: 12, lg: 6 }}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">isVegetarian</InputLabel>

@@ -17,10 +17,10 @@ const MenuTable = () => {
     useEffect(() => {
         dispatch(getMenuItemsByRestaurantId({
             restaurantId: restaurant.usersRestaurant.id,
-            isVegetarian: false,
-            isSeasonal: true,
-            isNonVegetarian: false,
-            foodCategory: ""
+            // isVegetarian: false,
+            // isSeasonal: true,
+            // isNonVegetarian: false,
+            // foodCategory: ""
         }));
 
     }, [restaurant.usersRestaurant.id, jwt]);
@@ -45,7 +45,7 @@ const MenuTable = () => {
                             <CreateIcon />
                         </IconButton>
                     }
-                    title={"All Orders"}
+                    title={"Menu"}
                     sx={{ pt: 2, alignItems: "center" }}
                 />
                 <TableContainer component={Paper}>
