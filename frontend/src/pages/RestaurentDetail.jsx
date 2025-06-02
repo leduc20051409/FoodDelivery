@@ -88,7 +88,7 @@ const RestaurentDetail = () => {
                     </Grid>
                 </div>
 
-                <div className="pt-3 pb-5">
+                <div className="py-5 space-y-3">
                     <h1 className="text-4xl font-semibold">{restaurant.restaurant?.cuisineType} Fast Food</h1>
                     <p className="text-gray-500">{restaurant.restaurant?.description}</p>
                     <div className="space-y-3 mt-3">
