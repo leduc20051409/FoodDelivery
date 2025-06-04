@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { createIngredientCategory } from '../../components/State/Ingredients/Action';
 
-const CreateIngredientCategoryForm = () => {
+const CreateIngredientCategoryForm = ({ handleClose }) => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("token");
     const { restaurant } = useSelector(store => store);
@@ -18,9 +18,9 @@ const CreateIngredientCategoryForm = () => {
             restaurantId: restaurant.usersRestaurant.id,
         }
 
-        dispatch(createIngredientCategory({data, jwt}));
+        dispatch(createIngredientCategory({ data, jwt }));
         console.log(formData);
-
+        handleClose();
     }
     const handleInputChange = (e) => {
         const { name, value } = e.target;

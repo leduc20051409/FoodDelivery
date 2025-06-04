@@ -27,6 +27,7 @@ const initialValues = {
 
 const CreateRestaurantForm = () => {
   const [uploadImage, setUploadImage] = useState(false);
+  const jwt = localStorage.getItem("token");
   const dispatch = useDispatch();
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -61,7 +62,8 @@ const CreateRestaurantForm = () => {
         images: values.images,
       };
       console.log(data);
-      dispatch(createRestaurant({ data , token: localStorage.getItem("token") }));
+      console.log("jwt token", jwt);
+      dispatch(createRestaurant({ data , token: jwt }));
     },
   });
   const handleImageChange = async (e) => {

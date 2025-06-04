@@ -79,7 +79,7 @@ const IngredientCategoryTable = () => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <CreateIngredientCategoryForm />
+                    <CreateIngredientCategoryForm handleClose={handleClose} />
                 </Box>
             </Modal>
         </Box>

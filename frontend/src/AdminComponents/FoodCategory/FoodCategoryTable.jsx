@@ -29,10 +29,9 @@ const FoodCategoryTable = () => {
     const jwt = localStorage.getItem("token");
     useEffect(() => {
         dispatch(getRestaurantsCategory({
-            jwt: jwt, restaurantId: restaurant.usersRestaurant?.id
-        }))
-
-    }, [jwt]);
+            restaurantId: restaurant.usersRestaurant?.id
+        }));
+    }, []);
     return (
         <Box>
             <Card className='mt-1'>
@@ -78,7 +77,7 @@ const FoodCategoryTable = () => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <CreateFoodCategoryForm />
+                    <CreateFoodCategoryForm handleClose={handleClose} />
                 </Box>
             </Modal>
         </Box>

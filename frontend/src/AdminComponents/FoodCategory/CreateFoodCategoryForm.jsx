@@ -1,9 +1,12 @@
 import { Button, TextField } from '@mui/material';
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
-import { createCategoryAction } from '../../components/State/Restaurant/Action';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { createCategoryAction, getRestaurantById, getRestaurantByUserId } from '../../components/State/Restaurant/Action';
+import { useParams } from 'react-router-dom';
 
-const CreateFoodCategoryForm = () => {
+const CreateFoodCategoryForm = ({handleClose}) => {
+    const { id } = useParams();
+    const { restaurant } = useSelector(store => store);
     const [formData, setFormData] = useState({
         categoryName: '',
         restaurantId: '',
@@ -14,13 +17,14 @@ const CreateFoodCategoryForm = () => {
         const data = {
             name: formData.categoryName,
             restaurantId: {
-                id: 1,
+                id: restaurant.usersRestaurant?.id
             },
         };
         dispatch(createCategoryAction({ reqData: data, jwt: localStorage.getItem("token") }));
         console.log(data);
-
+        handleClose();
     }
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -28,6 +32,7 @@ const CreateFoodCategoryForm = () => {
             [name]: value,
         });
     }
+
     return (
         <div>
             <div className='px-5'>
