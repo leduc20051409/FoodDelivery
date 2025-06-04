@@ -47,6 +47,10 @@ const LoginForm = () => {
                 Don't have an account?
                 <span onClick={() => navigate("/account/register")} className='text-pink-600 cursor-pointer'>Register</span>
             </Typography>
+
+             <Typography variant='body2' align='center' sx={{ mt: 3 }}>
+                <span onClick={() => navigate("/account/forgot-password")}  className='text-pink-700 cursor-pointer hover:underline'>Forgot Password</span>
+            </Typography>
         </>
     )
 }
