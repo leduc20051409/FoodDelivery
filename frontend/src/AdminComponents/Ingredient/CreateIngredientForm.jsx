@@ -1,7 +1,7 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { createIngredient } from '../../State/Ingredients/Action';
+import { createIngredient } from '../../State/Customer/Ingredients/Action';
 
 const CreateIngredientForm = ({ handleClose }) => {
     const { restaurant, ingredient } = useSelector(store => store);

@@ -6,7 +6,7 @@ import MenuCard from '../components/MenuCard';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRestaurantById, getRestaurantsCategory } from '../State/Customer/Restaurant/Action';
-import { getMenuItemsByRestaurantId } from '../State/Menu/Action';
+import { getMenuItemsByRestaurantId } from '../State/Customer/Menu/Action';
 
 
 const RestaurentDetail = () => {

@@ -5,7 +5,7 @@ import { Create } from '@mui/icons-material';
 import CreateIngredientForm from './CreateIngredientForm';
 import CreateIngredientCategoryForm from './CreateIngredientCategoryForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { getIngredientCategory } from '../../State/Ingredients/Action';
+import { getIngredientCategory } from '../../State/Customer/Ingredients/Action';
 
 
 const style = {

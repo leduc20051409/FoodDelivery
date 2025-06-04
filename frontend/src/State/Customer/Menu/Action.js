@@ -1,6 +1,7 @@
 
 
-import { api } from "../../components/config/Api";
+
+import { api } from "../../../components/config/Api";
 import {
     CREATE_MENU_ITEM_FAILURE,
     CREATE_MENU_ITEM_REQUEST,

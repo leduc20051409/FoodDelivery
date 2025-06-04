@@ -6,7 +6,7 @@ import RestaurentDetail from './RestaurentDetail';
 import Auth from '../components/auth/Auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllRestaurantsAction } from '../State/Customer/Restaurant/Action';
-import { store } from '../components/State/Store';
+import { store } from '../State/Store';
 import { Pagination, Stack } from '@mui/material';
 
 const ITEMS_PER_PAGE = 8;
