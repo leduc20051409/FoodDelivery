@@ -5,8 +5,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import MenuCard from '../components/MenuCard';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRestaurantById, getRestaurantsCategory } from '../components/State/Restaurant/Action';
-import { getMenuItemsByRestaurantId } from '../components/State/Menu/Action';
+import { getRestaurantById, getRestaurantsCategory } from '../State/Customer/Restaurant/Action';
+import { getMenuItemsByRestaurantId } from '../State/Menu/Action';
+
 
 const RestaurentDetail = () => {
     const categories = [

@@ -2,7 +2,6 @@ import React, { use, useEffect } from 'react'
 import AdminSidebar from './AdminSidebar'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { logOut } from '../../components/State/Authentication/Action'
 import Dashboard from '../Dashboard/DashBoard'
 import Orders from '../Orders/Orders'
 import Menu from '../Menu/Menu'
@@ -11,7 +10,7 @@ import Ingredient from '../Ingredient/Ingredient'
 import Events from '../Event/Events'
 import CreateMenuForm from '../Menu/CreateMenuForm'
 import RestaurantDetails from '../Details/RestaurantDetails'
-import { getRestaurantsCategory } from '../../components/State/Restaurant/Action'
+import { getRestaurantsCategory } from '../../State/Customer/Restaurant/Action'
 
 
 const Admin = () => {

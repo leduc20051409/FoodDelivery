@@ -5,7 +5,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateFoodCategoryForm from './CreateFoodCategoryForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRestaurantsCategory } from '../../components/State/Restaurant/Action';
+import { getRestaurantsCategory } from '../../State/Customer/Restaurant/Action';
 
 const style = {
     position: 'absolute',

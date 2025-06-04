@@ -5,7 +5,7 @@ import RestaurantCard from '../components/RestaurantCard';
 import RestaurentDetail from './RestaurentDetail';
 import Auth from '../components/auth/Auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllRestaurantsAction } from '../components/State/Restaurant/Action';
+import { getAllRestaurantsAction } from '../State/Customer/Restaurant/Action';
 import { store } from '../components/State/Store';
 import { Pagination, Stack } from '@mui/material';
 

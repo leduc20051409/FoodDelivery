@@ -4,7 +4,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToFavourite } from '../components/State/Authentication/Action';
+import { addToFavourite } from '../State/Customer/Authentication/Action';
 import { isPresentInFavourites } from './config/Logic';
 
 const RestaurantCard = ({ item }) => {

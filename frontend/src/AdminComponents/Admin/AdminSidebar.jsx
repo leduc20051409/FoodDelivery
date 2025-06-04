@@ -4,7 +4,8 @@ import { ShopTwo as ShopTwoIcon, Category as CategoryIcon, Fastfood as FastfoodI
 import { Divider, Drawer, useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logOut } from '../../components/State/Authentication/Action';
+import { logOut } from '../../State/Customer/Authentication/Action';
+
 const AdminSidebar = ({ handleClose }) => {
     const menu = [
         { title: "Dashboard", icon: <Dashboard />, path: "/" },

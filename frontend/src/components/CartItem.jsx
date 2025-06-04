@@ -4,7 +4,8 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Chip, IconButton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { removeCartItem, updateCartItem } from './State/Cart/Action';
+import { removeCartItem, updateCartItem } from '../State/Customer/Cart/Action';
+
 
 const CartItem = ({ item }) => {
     const demo = [1, 1, 1, 1];

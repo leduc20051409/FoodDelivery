@@ -3,10 +3,10 @@ import './App.css'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { darkTheme } from './theme/DarkTheme'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUser } from './components/State/Authentication/Action'
-import { findCart } from './components/State/Cart/Action'
+import { findCart } from './State/Customer/Cart/Action'
 import Router from './Routers/Router'
-import { getRestaurantByUserId } from './components/State/Restaurant/Action'
+import { getRestaurantByUserId } from './State/Customer/Restaurant/Action'
+import { getUser } from './State/Customer/Authentication/Action'
 
 
 function App() {

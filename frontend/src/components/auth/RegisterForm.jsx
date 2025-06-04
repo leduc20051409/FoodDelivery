@@ -3,7 +3,7 @@ import { Formik, Form, Field } from 'formik'
 import { Button, FormControl, TextField, Typography, Select, MenuItem, InputLabel } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { registerUser } from '../State/Authentication/Action'
+import { registerUser } from '../../State/Customer/Authentication/Action'
 
 const RegisterForm = () => {
     const initialValues = {

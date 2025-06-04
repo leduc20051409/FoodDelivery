@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import CreateEventForm from "./CreateEventForm";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
-import { createEventAction } from "../../components/State/Restaurant/Action";
+import { createEventAction } from "../../State/Customer/Restaurant/Action";
 
 const initialValues = {
   image: "",

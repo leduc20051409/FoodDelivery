@@ -6,7 +6,7 @@ import XIcon from '@mui/icons-material/X';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateRestaurantStatus } from '../../components/State/Restaurant/Action';
+import { updateRestaurantStatus } from '../../State/Customer/Restaurant/Action';
 
 
 const RestaurantDetails = () => {

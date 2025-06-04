@@ -3,7 +3,8 @@ import React, { use, useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { categorizeIngredient } from './Util/CategorizeIngredient';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItemToCart } from './State/Cart/Action';
+import { addItemToCart } from '../State/Customer/Cart/Action';
+
 
 const MenuCard = ({ item }) => {
     const {auth} = useSelector(store => store);

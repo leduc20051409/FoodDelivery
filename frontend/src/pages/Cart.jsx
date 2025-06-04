@@ -6,7 +6,7 @@ import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { createOrder } from '../components/State/Orders/Action';
+import { createOrder } from '../State/Customer/Orders/Action';
 
 export const style = {
   position: 'absolute',
