@@ -55,7 +55,7 @@ const Cart = () => {
           city: values.city,
           stateProvince: values.state,
           postalCode: values.pincode,
-          country: "Italia",
+          country: values.country,
         }
       }
     }

@@ -32,7 +32,7 @@ const RestaurentDetail = () => {
     const { auth, restaurant, menu } = useSelector(store => store);
     const { id, city } = useParams();
     const [selectedCategory, setSelectedCategory] = useState("");
-    
+
     useEffect(() => {
         console.log("restaurant", restaurant);
         console.log("restaurant categories", restaurant.categories);
@@ -49,12 +49,13 @@ const RestaurentDetail = () => {
             isVegetarian: foodType === "vegetarian",
             isNonVegetarian: foodType === "non_vegetarian",
             isSeasonal: foodType === "seasonal",
-            foodCategory: selectedCategory || ""
+            foodCategory: selectedCategory
         }));
     }, [selectedCategory, foodType]);
 
     const handleFilterCategory = (e) => {
-        setSelectedCategory(e.target.value);
+        const value = e.target.value;
+        setSelectedCategory(value === "all" ? "" : value);
     }
 
     return (
@@ -133,7 +134,13 @@ const RestaurentDetail = () => {
                                 Food Category
                             </Typography>
                             <FormControl className="py-10 space-y-5" component={"fieldset"}>
-                                <RadioGroup onChange={handleFilterCategory} name="food_type" value={selectedCategory}>
+                                <RadioGroup onChange={handleFilterCategory} name="food_type" value={selectedCategory || "all"}>
+                                    <FormControlLabel
+                                        value={"all"}
+                                        control={<Radio />}
+                                        label={"All"}
+                                        sx={{ color: "gray" }}
+                                    />
                                     {restaurant.categories.map((item) => (
                                         <FormControlLabel
                                             key={item.id}
