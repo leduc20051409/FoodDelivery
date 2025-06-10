@@ -65,22 +65,20 @@ export const getMenuItemsByRestaurantId = (reqData) => {
     };
 };
 
-export const searchMenuItem = ({ keyword, jwt }) => {
+export const searchMenuItem = ({ keyword, restaurantId }) => {
     return async (dispatch) => {
         dispatch({ type: SEARCH_MENU_ITEM_REQUEST });
         try {
-            const { data } = await api.get(`api/food/search?name=${keyword}`, {
-                headers: {
-                    Authorization: `Bearer ${jwt}`,
-                },
-            });
+            const { data } = await api.get(`food/search?keyword=${keyword}&restaurantId=${restaurantId}`);
             console.log("data ----------- ", data);
             dispatch({ type: SEARCH_MENU_ITEM_SUCCESS, payload: data });
         } catch (error) {
             dispatch({ type: SEARCH_MENU_ITEM_FAILURE });
+            console.log("menu item search error ", error);
         }
     };
 };
+
 
 export const getAllIngredientsOfMenuItem = (reqData) => {
     return async (dispatch) => {
