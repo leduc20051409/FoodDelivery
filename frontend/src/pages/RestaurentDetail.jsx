@@ -36,6 +36,11 @@ const RestaurentDetail = () => {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const displayedMenuItems = menu.search.length > 0 ? menu.search : menu.menuItems;
+    const address = `${restaurant.restaurant?.address.streetAddress}, ${restaurant.restaurant?.address.city}, ${restaurant.restaurant?.address.stateProvince}, ${restaurant.restaurant?.address.country}`;
+
+    useEffect(() => {
+        console.log("restaurant", restaurant);
+    },[]);
 
     useEffect(() => {
         dispatch(getRestaurantById({ restaurantId: id }));
@@ -98,11 +103,11 @@ const RestaurentDetail = () => {
                     <div className="space-y-3 mt-3">
                         <p className="text-gray-500 flex items-center gap-3">
                             <LocationOnIcon />
-                            <span>123 Main Street, Anytown, USA</span>
+                            <span>{address}</span>
                         </p>
                         <p className="text-gray-500 flex items-center gap-3">
                             <CalendarTodayIcon />
-                            <span>Monday to Friday - 9:00am to 10:00pm</span>
+                            <span>{restaurant.restaurant?.openingHours}</span>
                         </p>
                     </div>
                 </div>

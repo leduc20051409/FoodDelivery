@@ -6,6 +6,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import NotificationsSharpIcon from '@mui/icons-material/NotificationsSharp';
+import LightModeIcon from '@mui/icons-material/LightMode';
+
 const NavBar = () => {
     const { auth, cart } = useSelector(store => store);
     const navigate = useNavigate();
@@ -52,6 +54,7 @@ const NavBar = () => {
                         <NotificationsSharpIcon />
                     </IconButton>
                 </div>
+               
             </div>
         </Box>
     )

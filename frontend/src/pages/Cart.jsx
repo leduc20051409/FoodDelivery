@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CartItem from '../components/CartItem'
 import { Box, Button, Card, Divider, Grid, Modal, TextField, Typography } from '@mui/material'
 import AddressCart from '../components/AddressCart';
@@ -19,6 +19,7 @@ export const style = {
   boxShadow: 24,
   p: 4,
 };
+
 const Cart = () => {
   const demo = [1, 1, 1, 1];
   const intitalValue = {
@@ -61,6 +62,11 @@ const Cart = () => {
     }
     dispatch(createOrder(data));
   }
+
+  useEffect(() => {
+    console.log('auth', auth); 
+    
+  },[]);
   
   if (!cart?.cart) {
     return (
@@ -107,7 +113,7 @@ const Cart = () => {
               Choose Delivery Address
             </h1>
             <div className="flex gap-5 flex-wrap justify-center">
-              {demo.map((item) => (
+              {auth.user?.addresses.map((item) => (
                 <AddressCart handleSelectAddress={createOrderUsingAddress} item={item} showButton={true} />
               ))}
               <Card className="flex gap-5 w-64 p-5">
