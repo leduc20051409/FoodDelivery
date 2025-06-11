@@ -69,8 +69,12 @@ export const searchMenuItem = ({ keyword, restaurantId }) => {
     return async (dispatch) => {
         dispatch({ type: SEARCH_MENU_ITEM_REQUEST });
         try {
-            const { data } = await api.get(`food/search?keyword=${keyword}&restaurantId=${restaurantId}`);
-            console.log("data ----------- ", data);
+            let url = `food/search?keyword=${keyword}`;
+            // Only add restaurantId if it's provided and not null
+            if (restaurantId) {
+                url += `&restaurantId=${restaurantId}`;
+            }
+            const { data } = await api.get(url);
             dispatch({ type: SEARCH_MENU_ITEM_SUCCESS, payload: data });
         } catch (error) {
             dispatch({ type: SEARCH_MENU_ITEM_FAILURE });
