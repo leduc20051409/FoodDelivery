@@ -8,6 +8,7 @@ import NavBar from '../components/NavBar'
 import RestaurentDetail from '../pages/RestaurentDetail'
 import PaymentSuccess from '../components/PaymentSuccess/PaymentSuccess'
 import Search from '../components/Search/Search'
+import CheckoutPage from '../components/Order/CheckoutPage.'
 const CustomerRoute = () => {
     return (
         <div>
@@ -19,8 +20,9 @@ const CustomerRoute = () => {
                 <Route path="/account/forgot-password" element={<Home />} />
                 <Route path="/restaurant/:city/:title/:id" element={<RestaurentDetail />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path='/cart/checkout' element={<CheckoutPage />} />
                 <Route path="/my-profile/*" element={<Profile />} />
-                <Route path='/search' element={<Search/>}/>
+                <Route path='/search' element={<Search />} />
                 <Route path="/payment/success/:id" element={<PaymentSuccess />} />
             </Routes>
         </div>

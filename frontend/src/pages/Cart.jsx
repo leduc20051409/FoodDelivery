@@ -7,6 +7,7 @@ import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createOrder } from '../State/Customer/Orders/Action';
+import { useNavigate } from 'react-router-dom';
 
 export const style = {
   position: 'absolute',
@@ -37,13 +38,15 @@ const Cart = () => {
   const [open, setOpen] = useState(false);
   const { auth, cart } = useSelector(store => store);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleClose = () => setOpen(false);
   const handleOpenAddAddressModal = () => {
     setOpen(true);
   };
-  const createOrderUsingAddress = () => {
-    console.log('clicked');
+  const createOrderUsingAddress = (address) => {
+    dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
+    navigate('/cart/checkout');
   }
   const handleSubmit = (values) => {
     const data = {
@@ -114,7 +117,7 @@ const Cart = () => {
             </h1>
             <div className="flex gap-5 flex-wrap justify-center">
               {auth.user?.addresses.map((item) => (
-                <AddressCart handleSelectAddress={createOrderUsingAddress} item={item} showButton={true} />
+                <AddressCart navigateToCheckOut={() => navigate('/cart/checkout')} handleSelectAddress={createOrderUsingAddress} item={item} showButton={true} />
               ))}
               <Card className="flex gap-5 w-64 p-5">
                 <AddLocationAltIcon />

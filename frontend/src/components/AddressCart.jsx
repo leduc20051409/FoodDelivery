@@ -2,7 +2,7 @@ import { Button, Card } from '@mui/material'
 import React from 'react'
 import HomeIcon from '@mui/icons-material/Home';
 
-const AddressCart = ({item, showButton, handleSelectAddress}) => {
+const AddressCart = ({ item, showButton, handleSelectAddress, navigateToCheckOut }) => {
     return (
         <Card className="flex gap-5 w-64 p-5">
             <HomeIcon />
@@ -11,7 +11,11 @@ const AddressCart = ({item, showButton, handleSelectAddress}) => {
                 <p>
                     {item.streetAddress}, {item.stateProvince}, {item.postalCode}
                 </p>
-                {showButton && (<Button variant='outlined' fullWidth onChange={handleSelectAddress(item)}>Select</Button>)}
+                {showButton && (<Button variant='outlined' fullWidth
+                    onClick={() => {
+                        handleSelectAddress(item); 
+                        navigateToCheckOut();
+                    }}>Select</Button>)}
             </div>
         </Card>
     )

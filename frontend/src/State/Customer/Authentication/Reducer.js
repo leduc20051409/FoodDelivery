@@ -1,14 +1,15 @@
 
 
 import { isPresentInFavourites } from "../../../components/config/Logic";
-import { REGISTER_REQUEST, LOGIN_REQUEST, GET_USER_REQUEST, ADD_TO_FAVOURITE_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, REGISTER_FAILURE, LOGIN_FAILURE, GET_USER_FAILURE, ADD_TO_FAVOURITE_FAILURE, GET_USER_SUCCESS, LOGOUT, ADD_TO_FAVOURITE_SUCCESS } from "./ActionType";
+import { REGISTER_REQUEST, LOGIN_REQUEST, GET_USER_REQUEST, ADD_TO_FAVOURITE_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, REGISTER_FAILURE, LOGIN_FAILURE, GET_USER_FAILURE, ADD_TO_FAVOURITE_FAILURE, GET_USER_SUCCESS, LOGOUT, ADD_TO_FAVOURITE_SUCCESS, SET_SELECTED_ADDRESS } from "./ActionType";
 const initialState = {
     user: null,
     error: null,
     jwt: localStorage.getItem("token"),
     favorites: [],
     success: null,
-    isLoading: false
+    isLoading: false,
+    selectedAddress: null
 };
 
 
@@ -58,6 +59,11 @@ export const authReducer = (state = initialState, action) => {
                 isLoading: false,
                 error: action.payload,
                 success: null
+            };
+        case SET_SELECTED_ADDRESS:
+            return {
+                ...state,
+                selectedAddress: action.payload
             };
         case LOGOUT:
             return initialState;
