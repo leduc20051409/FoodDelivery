@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
  // Đường dẫn đến file api.js của bạn
 import { GET_USER_REQUEST, GET_USER_SUCCESS, GET_USER_FAILURE } from "./ActionType"; // Đường dẫn đến ActionTypes của bạn
-import { api } from "../../config/Api";
+import { api } from "../../../components/config/Api";
 export const getUser = (jwt) => async (dispatch) => {
     dispatch({ type: GET_USER_REQUEST });
     try {

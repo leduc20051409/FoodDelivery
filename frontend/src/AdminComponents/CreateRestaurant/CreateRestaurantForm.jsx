@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { uploadImageToCloudinary } from '../Utils/UploadToCloudinary';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
-import { createRestaurant } from '../../components/State/Restaurant/Action';
+import { createRestaurant } from '../../State/Customer/Restaurant/Action';
 
 const initialValues = {
   name: "",

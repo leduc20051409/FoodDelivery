@@ -7,6 +7,7 @@ import Profile from '../pages/Profile'
 import NavBar from '../components/NavBar'
 import RestaurentDetail from '../pages/RestaurentDetail'
 import PaymentSuccess from '../components/PaymentSuccess/PaymentSuccess'
+import Search from '../components/Search/Search'
 const CustomerRoute = () => {
     return (
         <div>
@@ -15,9 +16,11 @@ const CustomerRoute = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/account/register" element={<Home />} />
                 <Route path="/account/login" element={<Home />} />
+                <Route path="/account/forgot-password" element={<Home />} />
                 <Route path="/restaurant/:city/:title/:id" element={<RestaurentDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/my-profile/*" element={<Profile />} />
+                <Route path='/search' element={<Search/>}/>
                 <Route path="/payment/success/:id" element={<PaymentSuccess />} />
             </Routes>
         </div>

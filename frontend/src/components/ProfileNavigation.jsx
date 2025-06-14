@@ -10,7 +10,7 @@ import { Divider, useMediaQuery } from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logOut } from './State/Authentication/Action';
+import { logOut } from '../State/Customer/Authentication/Action';
 const ProfileNavigation = ({ open, handleClose }) => {
     const menu = [
         { title: "Orders", icon: <ShoppingBagIcon /> },

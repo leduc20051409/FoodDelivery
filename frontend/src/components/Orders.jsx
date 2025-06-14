@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import OrderCard from './OrderCard'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getUsersOrders } from './State/Orders/Action';
+import { getUsersOrders } from '../State/Customer/Orders/Action';
 
 const Orders = () => {
   const { cart, auth, order } = useSelector(store => store);

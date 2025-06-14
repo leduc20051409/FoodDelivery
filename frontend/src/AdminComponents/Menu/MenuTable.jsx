@@ -5,8 +5,8 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMenuItemsByRestaurantId } from '../../components/State/Menu/Action';
-import { deleteFoodAction } from '../../components/State/Menu/Action';
+
+import { deleteFoodAction, getMenuItemsByRestaurantId } from '../../State/Customer/Menu/Action';
 
 const MenuTable = () => {
     const dispatch = useDispatch();

@@ -5,7 +5,9 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonIcon from '@mui/icons-material/Person';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Home from '../pages/Home';
+import NotificationsSharpIcon from '@mui/icons-material/NotificationsSharp';
+import LightModeIcon from '@mui/icons-material/LightMode';
+
 const NavBar = () => {
     const { auth, cart } = useSelector(store => store);
     const navigate = useNavigate();
@@ -27,7 +29,7 @@ const NavBar = () => {
 
             <div className="flex items-center space-x-2 lg:space-x-10">
                 <div>
-                    <IconButton>
+                    <IconButton onClick={() => navigate("/search")}>
                         <SearchIcon sx={{ fontSize: '1.5rem' }} />
                     </IconButton>
                 </div>
@@ -44,10 +46,15 @@ const NavBar = () => {
                     <IconButton onClick={() => navigate("/cart")}>
                         <Badge color='secondary' badgeContent={cart.cart?.items.length}>
                             <ShoppingCartIcon sx={{ fontSize: '1.5rem' }}>C</ShoppingCartIcon>
-
                         </Badge>
                     </IconButton>
                 </div>
+                <div className="">
+                    <IconButton >
+                        <NotificationsSharpIcon />
+                    </IconButton>
+                </div>
+               
             </div>
         </Box>
     )

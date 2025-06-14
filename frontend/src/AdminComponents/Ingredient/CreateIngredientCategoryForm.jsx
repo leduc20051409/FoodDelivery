@@ -1,7 +1,7 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { createIngredientCategory } from '../../components/State/Ingredients/Action';
+import { createIngredientCategory } from '../../State/Customer/Ingredients/Action';
 
 const CreateIngredientCategoryForm = ({ handleClose }) => {
     const dispatch = useDispatch();

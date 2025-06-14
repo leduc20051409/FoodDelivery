@@ -1,5 +1,5 @@
 // Reducers.js
-import { LOGOUT } from "../Authentication/ActionType";
+import { LOGOUT } from "../../../State/Customer/Authentication/ActionType";
 import {
     ADD_ITEM_TO_CART_SUCCESS, CLEARE_CART_SUCCESS,
     FIND_CART_FAILURE, FIND_CART_REQUEST, FIND_CART_SUCCESS,

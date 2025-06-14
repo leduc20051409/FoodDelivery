@@ -6,9 +6,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { uploadImageToCloudinary } from '../Utils/UploadToCloudinary';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { createMenuItem } from '../../components/State/Menu/Action';
-import { getIngredientCategory, getIngredientsOfRestaurant } from '../../components/State/Ingredients/Action';
-import { getRestaurantsCategory } from '../../components/State/Restaurant/Action';
+import { getIngredientCategory, getIngredientsOfRestaurant } from '../../State/Customer/Ingredients/Action';
+import { getRestaurantsCategory } from '../../State/Customer/Restaurant/Action';
+import { createMenuItem } from '../../State/Customer/Menu/Action';
 
 const initialValues = {
     name: "",

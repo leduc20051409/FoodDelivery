@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CartItem from '../components/CartItem'
 import { Box, Button, Card, Divider, Grid, Modal, TextField, Typography } from '@mui/material'
 import AddressCart from '../components/AddressCart';
@@ -6,7 +6,7 @@ import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { createOrder } from '../components/State/Orders/Action';
+import { createOrder } from '../State/Customer/Orders/Action';
 
 export const style = {
   position: 'absolute',
@@ -19,6 +19,7 @@ export const style = {
   boxShadow: 24,
   p: 4,
 };
+
 const Cart = () => {
   const demo = [1, 1, 1, 1];
   const intitalValue = {
@@ -55,12 +56,17 @@ const Cart = () => {
           city: values.city,
           stateProvince: values.state,
           postalCode: values.pincode,
-          country: "Italia",
+          country: values.country,
         }
       }
     }
     dispatch(createOrder(data));
   }
+
+  useEffect(() => {
+    console.log('auth', auth); 
+    
+  },[]);
   
   if (!cart?.cart) {
     return (
@@ -95,7 +101,8 @@ const Cart = () => {
             </div>
             <div className="flex justify-between text-gray-400 ">
               <p>Total pay</p>
-              <p>${cart.cart.total + 54}</p>
+              <Divider orientation="vertical" />
+              <p className="font-bold text-red-500 text-lg">${cart.cart.total + 54}</p>
             </div>
           </div>
         </section>
@@ -106,7 +113,7 @@ const Cart = () => {
               Choose Delivery Address
             </h1>
             <div className="flex gap-5 flex-wrap justify-center">
-              {demo.map((item) => (
+              {auth.user?.addresses.map((item) => (
                 <AddressCart handleSelectAddress={createOrderUsingAddress} item={item} showButton={true} />
               ))}
               <Card className="flex gap-5 w-64 p-5">

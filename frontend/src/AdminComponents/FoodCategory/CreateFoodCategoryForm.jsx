@@ -1,7 +1,7 @@
 import { Button, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { createCategoryAction, getRestaurantById, getRestaurantByUserId } from '../../components/State/Restaurant/Action';
+import { createCategoryAction, getRestaurantById, getRestaurantByUserId } from '../../State/Customer/Restaurant/Action';
 import { useParams } from 'react-router-dom';
 
 const CreateFoodCategoryForm = ({handleClose}) => {

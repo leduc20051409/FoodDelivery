@@ -1,12 +1,15 @@
-import { Divider, FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material'
+import { Divider, FormControl, FormControlLabel, Grid, InputAdornment, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import MenuCard from '../components/MenuCard';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRestaurantById, getRestaurantsCategory } from '../components/State/Restaurant/Action';
-import { getMenuItemsByRestaurantId } from '../components/State/Menu/Action';
+import { getRestaurantById, getRestaurantsCategory } from '../State/Customer/Restaurant/Action';
+import { getMenuItemsByRestaurantId, searchMenuItem } from '../State/Customer/Menu/Action';
+import SearchIcon from '@mui/icons-material/Search';
+import RestaurantSearch from '../components/RestaurantSearch';
+
 
 const RestaurentDetail = () => {
     const categories = [
@@ -31,16 +34,19 @@ const RestaurentDetail = () => {
     const { auth, restaurant, menu } = useSelector(store => store);
     const { id, city } = useParams();
     const [selectedCategory, setSelectedCategory] = useState("");
-    
+    const [searchQuery, setSearchQuery] = useState("");
+    const displayedMenuItems = menu.search.length > 0 ? menu.search : menu.menuItems;
+    const address = `${restaurant.restaurant?.address.streetAddress}, ${restaurant.restaurant?.address.city}, ${restaurant.restaurant?.address.stateProvince}, ${restaurant.restaurant?.address.country}`;
+
     useEffect(() => {
         console.log("restaurant", restaurant);
-        console.log("restaurant categories", restaurant.categories);
-    },)
+    },[]);
 
     useEffect(() => {
         dispatch(getRestaurantById({ restaurantId: id }));
         dispatch(getRestaurantsCategory({ restaurantId: id }));
-    }, []);
+        dispatch(searchMenuItem({keyword: searchQuery, restaurantId: id}));
+    }, [searchQuery, id]);
 
     useEffect(() => {
         dispatch(getMenuItemsByRestaurantId({
@@ -48,12 +54,15 @@ const RestaurentDetail = () => {
             isVegetarian: foodType === "vegetarian",
             isNonVegetarian: foodType === "non_vegetarian",
             isSeasonal: foodType === "seasonal",
-            foodCategory: selectedCategory || ""
+            foodCategory: selectedCategory
         }));
     }, [selectedCategory, foodType]);
 
+    
+
     const handleFilterCategory = (e) => {
-        setSelectedCategory(e.target.value);
+        const value = e.target.value;
+        setSelectedCategory(value === "all" ? "" : value);
     }
 
     return (
@@ -94,11 +103,11 @@ const RestaurentDetail = () => {
                     <div className="space-y-3 mt-3">
                         <p className="text-gray-500 flex items-center gap-3">
                             <LocationOnIcon />
-                            <span>123 Main Street, Anytown, USA</span>
+                            <span>{address}</span>
                         </p>
                         <p className="text-gray-500 flex items-center gap-3">
                             <CalendarTodayIcon />
-                            <span>Monday to Friday - 9:00am to 10:00pm</span>
+                            <span>{restaurant.restaurant?.openingHours}</span>
                         </p>
                     </div>
                 </div>
@@ -132,7 +141,13 @@ const RestaurentDetail = () => {
                                 Food Category
                             </Typography>
                             <FormControl className="py-10 space-y-5" component={"fieldset"}>
-                                <RadioGroup onChange={handleFilterCategory} name="food_type" value={selectedCategory}>
+                                <RadioGroup onChange={handleFilterCategory} name="food_type" value={selectedCategory || "all"}>
+                                    <FormControlLabel
+                                        value={"all"}
+                                        control={<Radio />}
+                                        label={"All"}
+                                        sx={{ color: "gray" }}
+                                    />
                                     {restaurant.categories.map((item) => (
                                         <FormControlLabel
                                             key={item.id}
@@ -147,8 +162,10 @@ const RestaurentDetail = () => {
                     </div>
                 </div>
                 <div className="space-y-5 lg:w-[80%] lg:pl-10">
-                    {menu.menuItems.map((item, index) => <MenuCard item={item} key={index} />)}
-                </div>
+                        {/* THAY ĐỔI: Thêm thanh tìm kiếm */}
+                        <RestaurantSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        {displayedMenuItems.map((item, index) => <MenuCard item={item} key={index} />)}
+                    </div>
             </section>
 
         </div>

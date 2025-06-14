@@ -1,13 +1,14 @@
 import { applyMiddleware, combineReducers, legacy_createStore } from 'redux'
-import { authReducer } from './Authentication/Reducer'
+import { authReducer } from './Customer/Authentication/Reducer'
 import { configureStore } from '@reduxjs/toolkit'
 import { thunk } from 'redux-thunk'
-import restaurantReducer from './Restaurant/Reducer'
-import menuItemReducer from './Menu/Reducer'
-import cartReducer from './Cart/Reducer'
-import { orderReducer } from './Orders/Reducer'
-import { ingredientReducer } from './Ingredients/Reducer'
-import restaurantsOrderReducer from '../../State/Admin/Orders/Reducer'
+import restaurantReducer from './Customer/Restaurant/Reducer'
+
+import { orderReducer } from './Customer/Orders/Reducer'
+import { ingredientReducer } from './Customer/Ingredients/Reducer'
+import restaurantsOrderReducer from './Admin/Orders/Reducer'
+import cartReducer from './Customer/Cart/Reducer'
+import menuItemReducer from './Customer/Menu/Reducer'
 
 const rooteReducer = combineReducers({
   auth: authReducer,
@@ -16,7 +17,6 @@ const rooteReducer = combineReducers({
   cart: cartReducer,
   order: orderReducer,
   ingredient: ingredientReducer,
-
   restaurantOrder: restaurantsOrderReducer,
 })
 

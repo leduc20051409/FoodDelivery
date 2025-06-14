@@ -1,8 +1,9 @@
 // Actions.js
 
 
-import { api } from "../../config/Api";
 
+
+import { api } from "../../../components/config/Api";
 import {
     CREATE_CATEGORY_FAILURE, CREATE_CATEGORY_REQUEST, CREATE_CATEGORY_SUCCESS,
     CREATE_EVENTS_FAILURE, CREATE_EVENTS_REQUEST, CREATE_EVENTS_SUCCESS,

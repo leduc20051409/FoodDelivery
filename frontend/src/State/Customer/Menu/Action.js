@@ -1,5 +1,7 @@
 
-import { api } from "../../config/Api";
+
+
+import { api } from "../../../components/config/Api";
 import {
     CREATE_MENU_ITEM_FAILURE,
     CREATE_MENU_ITEM_REQUEST,
@@ -63,22 +65,24 @@ export const getMenuItemsByRestaurantId = (reqData) => {
     };
 };
 
-export const searchMenuItem = ({ keyword, jwt }) => {
+export const searchMenuItem = ({ keyword, restaurantId }) => {
     return async (dispatch) => {
         dispatch({ type: SEARCH_MENU_ITEM_REQUEST });
         try {
-            const { data } = await api.get(`api/food/search?name=${keyword}`, {
-                headers: {
-                    Authorization: `Bearer ${jwt}`,
-                },
-            });
-            console.log("data ----------- ", data);
+            let url = `food/search?keyword=${keyword}`;
+            // Only add restaurantId if it's provided and not null
+            if (restaurantId) {
+                url += `&restaurantId=${restaurantId}`;
+            }
+            const { data } = await api.get(url);
             dispatch({ type: SEARCH_MENU_ITEM_SUCCESS, payload: data });
         } catch (error) {
             dispatch({ type: SEARCH_MENU_ITEM_FAILURE });
+            console.log("menu item search error ", error);
         }
     };
 };
+
 
 export const getAllIngredientsOfMenuItem = (reqData) => {
     return async (dispatch) => {

@@ -3,7 +3,7 @@ import React, { use, useEffect } from 'react'
 import CreateIcon from '@mui/icons-material/Create';
 import CreateIngredientForm from './CreateIngredientForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { getIngredientsOfRestaurant, updateStockOfIngredient } from '../../components/State/Ingredients/Action';
+import { getIngredientsOfRestaurant, updateStockOfIngredient } from '../../State/Customer/Ingredients/Action';
 
 const IngredientTable = () => {
     const dispatch = useDispatch();

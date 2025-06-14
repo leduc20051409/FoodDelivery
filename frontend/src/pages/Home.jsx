@@ -5,8 +5,9 @@ import RestaurantCard from '../components/RestaurantCard';
 import RestaurentDetail from './RestaurentDetail';
 import Auth from '../components/auth/Auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllRestaurantsAction } from '../components/State/Restaurant/Action';
-import { store } from '../components/State/Store';
+import { getAllRestaurantsAction } from '../State/Customer/Restaurant/Action';
+import { store } from '../State/Store';
+import { Pagination, Stack } from '@mui/material';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -23,6 +24,10 @@ const Home = () => {
     const totalPages = Math.ceil(totalRestaurants.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentRestaurants = totalRestaurants.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value); // Cập nhật trang hiện tại
+    };
 
     return (
         <div className='pb-10'>
@@ -49,47 +54,31 @@ const Home = () => {
                 </div>
 
                 {/* Pagination Controls */}
-                <div className='flex justify-center items-center mt-6 gap-3'>
-                    <div className='flex justify-center items-center mt-6 gap-2'>
-                        {/* Nút mũi tên trái */}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className={`px-3 py-1 rounded-full border font-medium ${currentPage === 1
-                                    ? 'text-gray-400 cursor-not-allowed bg-gray-100'
-                                    : 'text-gray-800 bg-white hover:bg-gray-200'
-                                }`}
-                        >
-                            ←
-                        </button>
-
-                        {/* Các nút số trang */}
-                        {Array.from({ length: totalPages }).map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 py-1 rounded-full border font-medium ${currentPage === index + 1
-                                        ? 'bg-gray-800 text-white'
-                                        : 'bg-white text-gray-800 hover:bg-gray-200'
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-
-                        {/* Nút mũi tên phải */}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className={`px-3 py-1 rounded-full border font-medium ${currentPage === totalPages
-                                    ? 'text-gray-400 cursor-not-allowed bg-gray-100'
-                                    : 'text-gray-800 bg-white hover:bg-gray-200'
-                                }`}
-                        >
-                            →
-                        </button>
-                    </div>
-
+                <div className="flex justify-center items-center mt-6">
+                    <Stack spacing={2}>
+                        {/* Sử dụng component Pagination của MUI thay vì các nút button thủ công */}
+                        <Pagination
+                            count={totalPages} // Tổng số trang
+                            page={currentPage} // Trang hiện tại
+                            onChange={handlePageChange} // Hàm xử lý khi thay đổi trang
+                            variant="outlined" // Kiểu viền
+                            shape="rounded" // Hình dạng nút bo góc
+                            sx={{
+                                // Tùy chỉnh kiểu để phù hợp với giao diện
+                                '& .MuiPaginationItem-root': {
+                                    color: '#374151', // Màu chữ của các nút
+                                    borderColor: '#d1d5db', // Màu viền
+                                },
+                                '& .Mui-selected': {
+                                    backgroundColor: '#1f2937', // Màu nền khi nút được chọn
+                                    color: '#ffffff', // Màu chữ khi được chọn
+                                    '&:hover': {
+                                        backgroundColor: '#374151', // Màu nền khi hover
+                                    },
+                                },
+                            }}
+                        />
+                    </Stack>
                 </div>
             </section>
 
