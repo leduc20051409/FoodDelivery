@@ -1,4 +1,4 @@
-import { ADD_ADDRESS_FAILURE, ADD_ADDRESS_REQUEST, ADD_ADDRESS_SUCCESS, GET_ADDRESSES_REQUEST, GET_ADDRESSES_SUCCESS, UPDATE_ADDRESS_FAILURE, UPDATE_ADDRESS_REQUEST, UPDATE_ADDRESS_SUCCESS } from "./ActionType";
+import { ADD_ADDRESS_FAILURE, ADD_ADDRESS_REQUEST, ADD_ADDRESS_SUCCESS, DELETE_ADDRESS_REQUEST, DELETE_ADDRESS_SUCCESS, GET_ADDRESSES_REQUEST, GET_ADDRESSES_SUCCESS, UPDATE_ADDRESS_FAILURE, UPDATE_ADDRESS_REQUEST, UPDATE_ADDRESS_SUCCESS } from "./ActionType";
 
 const initialState = {
     addresses: [],
@@ -13,6 +13,7 @@ export const addressReducer = (state = initialState, action) => {
         case GET_ADDRESSES_REQUEST:
         case ADD_ADDRESS_REQUEST:
         case UPDATE_ADDRESS_REQUEST:
+        case DELETE_ADDRESS_REQUEST:
             return {
                 ...state,
                 isLoading: true,
@@ -52,6 +53,14 @@ export const addressReducer = (state = initialState, action) => {
                 isLoading: false,
                 error: action.payload,
                 success: null
+            };
+        case DELETE_ADDRESS_SUCCESS:
+            return {
+                ...state,
+                isLoading: false,
+                error: null,
+                addresses: state.addresses.filter((address) => address.id !== action.payload),
+                success: "Address deleted successfully"
             };
         default:
             return state;
