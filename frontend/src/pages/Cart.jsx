@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createOrder } from '../State/Customer/Orders/Action';
 import { useNavigate } from 'react-router-dom';
+import { getAddresses, updateAddress } from '../State/Customer/Addresses/Action ';
 
 export const style = {
   position: 'absolute',
@@ -35,8 +36,10 @@ const Cart = () => {
     pincode: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
   });
+
   const [open, setOpen] = useState(false);
-  const { auth, cart } = useSelector(store => store);
+  const jwt = localStorage.getItem("token");
+  const { auth, cart, addresses } = useSelector(store => store);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -66,11 +69,20 @@ const Cart = () => {
     dispatch(createOrder(data));
   }
 
+  const handleEditAddress = (address) => {
+    dispatch(updateAddress(address.id, address, jwt));
+  };
+
+  const handleDeleteAddress = (address) => {
+    console.log('Deleting address:', address);
+  };
+
   useEffect(() => {
-    console.log('auth', auth); 
-    
-  },[]);
-  
+    dispatch(getAddresses(jwt));
+    console.log('auth', auth);
+    console.log('addresses', addresses);
+  }, []);
+
   if (!cart?.cart) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -116,8 +128,14 @@ const Cart = () => {
               Choose Delivery Address
             </h1>
             <div className="flex gap-5 flex-wrap justify-center">
-              {auth.user?.addresses.map((item) => (
-                <AddressCart navigateToCheckOut={() => navigate('/cart/checkout')} handleSelectAddress={createOrderUsingAddress} item={item} showButton={true} />
+              {addresses.addresses.map((item) => (
+                <AddressCart
+                  navigateToCheckOut={() => navigate('/cart/checkout')}
+                  handleSelectAddress={createOrderUsingAddress}
+                  item={item}
+                  showButton={true}
+                  handleEditAddress={handleEditAddress}
+                  handleDeleteAddress={handleDeleteAddress} />
               ))}
               <Card className="flex gap-5 w-64 p-5">
                 <AddLocationAltIcon />
