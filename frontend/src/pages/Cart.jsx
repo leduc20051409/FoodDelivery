@@ -92,6 +92,7 @@ const Cart = () => {
     console.log('Deleting address:', address);
   };
 
+  
   useEffect(() => {
     dispatch(getAddresses(jwt));
     console.log('auth', auth);
