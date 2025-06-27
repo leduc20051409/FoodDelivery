@@ -35,18 +35,22 @@ const RestaurentDetail = () => {
     const { id, city } = useParams();
     const [selectedCategory, setSelectedCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
-    const displayedMenuItems = menu.search.length > 0 ? menu.search : menu.menuItems;
+    const displayedMenuItems = menu.menuItems.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     const address = `${restaurant.restaurant?.address.streetAddress}, ${restaurant.restaurant?.address.city}, ${restaurant.restaurant?.address.stateProvince}, ${restaurant.restaurant?.address.country}`;
+
+
+
 
     useEffect(() => {
         console.log("restaurant", restaurant);
-    },[]);
+    }, []);
 
     useEffect(() => {
         dispatch(getRestaurantById({ restaurantId: id }));
         dispatch(getRestaurantsCategory({ restaurantId: id }));
-        dispatch(searchMenuItem({keyword: searchQuery, restaurantId: id}));
-    }, [searchQuery, id]);
+    }, [id]);
 
     useEffect(() => {
         dispatch(getMenuItemsByRestaurantId({
@@ -58,7 +62,7 @@ const RestaurentDetail = () => {
         }));
     }, [selectedCategory, foodType]);
 
-    
+
 
     const handleFilterCategory = (e) => {
         const value = e.target.value;
@@ -162,10 +166,10 @@ const RestaurentDetail = () => {
                     </div>
                 </div>
                 <div className="space-y-5 lg:w-[80%] lg:pl-10">
-                        {/* THAY ĐỔI: Thêm thanh tìm kiếm */}
-                        <RestaurantSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        {displayedMenuItems.map((item, index) => <MenuCard item={item} key={index} />)}
-                    </div>
+                    {/* THAY ĐỔI: Thêm thanh tìm kiếm */}
+                    <RestaurantSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                    {displayedMenuItems.map((item, index) => <MenuCard item={item} key={index} />)}
+                </div>
             </section>
 
         </div>
