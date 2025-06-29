@@ -17,7 +17,7 @@ const CustomerRoute = () => {
         <div>
             <Routes>
                 <Route element={<EmptyLayout />}>
-                    <Route path="/forgot-password" element={<ResetPasswordForm />} />
+                    <Route path="/auth/reset-password/:token" element={<ResetPasswordForm />} />
                 </Route>
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<Home />} />

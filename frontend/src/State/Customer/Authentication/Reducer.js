@@ -1,7 +1,7 @@
 
 
 import { isPresentInFavourites } from "../../../components/config/Logic";
-import { REGISTER_REQUEST, LOGIN_REQUEST, GET_USER_REQUEST, ADD_TO_FAVOURITE_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, REGISTER_FAILURE, LOGIN_FAILURE, GET_USER_FAILURE, ADD_TO_FAVOURITE_FAILURE, GET_USER_SUCCESS, LOGOUT, ADD_TO_FAVOURITE_SUCCESS, SET_SELECTED_ADDRESS } from "./ActionType";
+import { REGISTER_REQUEST, LOGIN_REQUEST, GET_USER_REQUEST, ADD_TO_FAVOURITE_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, REGISTER_FAILURE, LOGIN_FAILURE, GET_USER_FAILURE, ADD_TO_FAVOURITE_FAILURE, GET_USER_SUCCESS, LOGOUT, ADD_TO_FAVOURITE_SUCCESS, SET_SELECTED_ADDRESS, RESET_PASSWORD_REQUEST, RESET_PASSWORD_SUCCESS, RESET_PASSWORD_FAILURE, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_FAILURE } from "./ActionType";
 const initialState = {
     user: null,
     error: null,
@@ -19,6 +19,8 @@ export const authReducer = (state = initialState, action) => {
         case LOGIN_REQUEST:
         case GET_USER_REQUEST:
         case ADD_TO_FAVOURITE_REQUEST:
+        case RESET_PASSWORD_REQUEST:
+        case FORGOT_PASSWORD_REQUEST:
             return {
                 ...state,
                 isLoading: true,
@@ -50,10 +52,26 @@ export const authReducer = (state = initialState, action) => {
                     ? state.favorites.filter((item) => item.id !== action.payload.id)
                     : [...state.favorites, action.payload]
             };
+        case FORGOT_PASSWORD_SUCCESS:
+            return {
+                ...state,
+                isLoading: false,
+                success: "Email sent successfully",
+                error: null
+            }
+        case RESET_PASSWORD_SUCCESS:
+            return {
+                ...state,
+                isLoading: false,
+                success: "Password reset successfully",
+                error: null
+            }
         case REGISTER_FAILURE:
         case LOGIN_FAILURE:
         case GET_USER_FAILURE:
         case ADD_TO_FAVOURITE_FAILURE:
+        case RESET_PASSWORD_FAILURE:
+        case FORGOT_PASSWORD_FAILURE:
             return {
                 ...state,
                 isLoading: false,
@@ -65,6 +83,7 @@ export const authReducer = (state = initialState, action) => {
                 ...state,
                 selectedAddress: action.payload
             };
+
         case LOGOUT:
             return initialState;
         default:
