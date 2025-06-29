@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { LOGIN_REQUEST, LOGIN_SUCCESS, REGISTER_REQUEST, REGISTER_SUCCESS, GET_USER_REQUEST, ADD_TO_FAVOURITE_REQUEST, LOGOUT, REGISTER_FAILURE, LOGIN_FAILURE, GET_USER_FAILURE, ADD_TO_FAVOURITE_FAILURE, GET_USER_SUCCESS, ADD_TO_FAVOURITE_SUCCESS } from "./ActionType";
+import { LOGIN_REQUEST, LOGIN_SUCCESS, REGISTER_REQUEST, REGISTER_SUCCESS, GET_USER_REQUEST, ADD_TO_FAVOURITE_REQUEST, LOGOUT, REGISTER_FAILURE, LOGIN_FAILURE, GET_USER_FAILURE, ADD_TO_FAVOURITE_FAILURE, GET_USER_SUCCESS, ADD_TO_FAVOURITE_SUCCESS, RESET_PASSWORD_REQUEST, RESET_PASSWORD_SUCCESS, RESET_PASSWORD_FAILURE, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_FAILURE } from "./ActionType";
 import { api, API_URL } from "../../../components/config/Api";
 export const registerUser = (reqData) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST });
@@ -79,7 +79,28 @@ export const addToFavourite = ({restaurantId, jwt}) => async (dispatch) => {
         console.log("error", error);
     }
 }
-
+export const forgotPassword = (reqData) => async (dispatch) => {
+    dispatch({ type: FORGOT_PASSWORD_REQUEST });
+    try {
+        const { data } = await api.post(`/auth/forgot-password?email=${reqData.email}`);
+        dispatch({ type: FORGOT_PASSWORD_SUCCESS, payload: data });
+        console.log("forgot password success", data);
+    } catch (error) {
+        dispatch({ type: FORGOT_PASSWORD_FAILURE, payload: error });
+        console.log("error", error);
+    }
+}
+export const resetPassword = ({token, newPassword}) => async (dispatch) => {
+    dispatch({ type: RESET_PASSWORD_REQUEST });
+    try {
+        const { data } = await api.post(`/auth/reset-password?token=${token}&newPassword=${newPassword}`);
+        dispatch({ type: RESET_PASSWORD_SUCCESS, payload: data });
+        console.log("reset password success", data);
+    } catch (error) {
+        dispatch({ type: RESET_PASSWORD_FAILURE, payload: error });
+        console.log("error", error);
+    }
+}
 export const logOut = () => async (dispatch) => {
     dispatch({ type: LOGOUT });
     try {

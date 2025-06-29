@@ -12,6 +12,8 @@ const RestaurantCard = ({ item }) => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("token");
     const { auth } = useSelector(store => store);
+    const address = `${item.address.streetAddress}, ${item.address.city}, ${item.address.stateProvince}, ${item.address.country}`;
+
     const hadleAddToFavorite = () => {
         dispatch(addToFavourite({ restaurantId: item.id, jwt }));
     };
@@ -48,7 +50,7 @@ const RestaurantCard = ({ item }) => {
                         {item.name}
                     </p>
                     <p className="text-gray-500 text-sm">
-                        {item.description}
+                        {address}
                     </p>
                 </div>
                 <div>

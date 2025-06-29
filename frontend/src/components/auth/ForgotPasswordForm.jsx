@@ -3,7 +3,7 @@ import { Formik, Form, Field } from 'formik'
 import { Button, TextField, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { loginUser } from '../../State/Customer/Authentication/Action'
+import { forgotPassword } from '../../State/Customer/Authentication/Action'
 const ForgotPasswordForm = () => {
     const initialValues = {
         email: "",
@@ -11,7 +11,8 @@ const ForgotPasswordForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleSubmit = (e) => {
-        e.preventDefault();
+        //e.preventDefault();
+        dispatch(forgotPassword({ email: e.email }));
     }
     return (
         <>

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import CartItem from '../components/CartItem'
-import { Box, Button, Card, Divider, Grid, Modal, TextField, Typography } from '@mui/material'
+import { Box, Button, Card, Divider, FormControl, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material'
 import AddressCart from '../components/AddressCart';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createOrder } from '../State/Customer/Orders/Action';
+import { useNavigate } from 'react-router-dom';
+import { addAddress, deleteAddress, getAddresses, updateAddress } from '../State/Customer/Addresses/Action ';
 
 export const style = {
   position: 'absolute',
@@ -25,25 +27,30 @@ const Cart = () => {
   const intitalValue = {
     streetAddress: '',
     state: '',
-    pincode: '',
+    postalCode: '',
     city: '',
+    country: '',
   }
   const validateSchema = Yup.object().shape({
     streetAddress: Yup.string().required('Required'),
     state: Yup.string().required('Required'),
-    pincode: Yup.string().required('Required'),
+    postalCode: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
   });
+
   const [open, setOpen] = useState(false);
-  const { auth, cart } = useSelector(store => store);
+  const jwt = localStorage.getItem("token");
+  const { auth, cart, addresses } = useSelector(store => store);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleClose = () => setOpen(false);
   const handleOpenAddAddressModal = () => {
     setOpen(true);
   };
-  const createOrderUsingAddress = () => {
-    console.log('clicked');
+  const createOrderUsingAddress = (address) => {
+    dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
+    navigate('/cart/checkout');
   }
   const handleSubmit = (values) => {
     const data = {
@@ -63,11 +70,35 @@ const Cart = () => {
     dispatch(createOrder(data));
   }
 
-  useEffect(() => {
-    console.log('auth', auth); 
-    
-  },[]);
+  const handleAddAddress = (values) => {
+    const addressData = {
+      streetAddress: values.streetAddress,
+      city: values.city,
+      stateProvince: values.state,
+      postalCode: values.postalCode,
+      country: values.country,
+    };
+    dispatch(addAddress(addressData, jwt));
+    console.log('Adding address:', addressData);
+    handleClose();
+  }
+
+  const handleEditAddress = (address) => {
+    dispatch(updateAddress(address.id, address, jwt));
+  };
+
+  const handleDeleteAddress = (address) => {
+    dispatch(deleteAddress(address.id, jwt));
+    console.log('Deleting address:', address);
+  };
+
   
+  useEffect(() => {
+    dispatch(getAddresses(jwt));
+    console.log('auth', auth);
+    console.log('addresses', addresses);
+  }, []);
+
   if (!cart?.cart) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -113,8 +144,14 @@ const Cart = () => {
               Choose Delivery Address
             </h1>
             <div className="flex gap-5 flex-wrap justify-center">
-              {auth.user?.addresses.map((item) => (
-                <AddressCart handleSelectAddress={createOrderUsingAddress} item={item} showButton={true} />
+              {addresses.addresses.map((item) => (
+                <AddressCart
+                  navigateToCheckOut={() => navigate('/cart/checkout')}
+                  handleSelectAddress={createOrderUsingAddress}
+                  item={item}
+                  showButton={true}
+                  handleEditAddress={handleEditAddress}
+                  handleDeleteAddress={handleDeleteAddress} />
               ))}
               <Card className="flex gap-5 w-64 p-5">
                 <AddLocationAltIcon />
@@ -138,82 +175,97 @@ const Cart = () => {
           <Formik
             initialValues={intitalValue}
             validationSchema={validateSchema}
-            onSubmit={handleSubmit}
+            onSubmit={handleAddAddress}
           >
-            <Form>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    name="streetAddress"
-                    label="Street Address"
-                    fullWidth
-                    variant="outlined"
-                    error={!ErrorMessage("streetAddress")}
-                    helperText={
-                      <ErrorMessage name="streetAddress">
-                        {(msg) => <span className='text-red-600'>{msg}</span>}
-                      </ErrorMessage>
-                    }
-                  />
+              <Form>
+                <Grid container spacing={2}>
+                  <Grid item size={{ xs: 12 }}>
+                    <Field
+                      as={TextField}
+                      name="streetAddress"
+                      label="Street Address"
+                      fullWidth
+                      variant="outlined"
+                      error={!ErrorMessage("streetAddress")}
+                      helperText={
+                        <ErrorMessage name="streetAddress">
+                          {(msg) => <span className='text-red-600'>{msg}</span>}
+                        </ErrorMessage>
+                      }
+                    />
 
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    name="state"
-                    label="state"
-                    fullWidth
-                    variant="outlined"
-                    error={!ErrorMessage("streetAddress")}
-                    helperText={
-                      <ErrorMessage name="streetAddress">
-                        {(msg) => <span className='text-red-600'>{msg}</span>}
-                      </ErrorMessage>
-                    }
-                  />
+                  </Grid>
+                  <Grid item size={{ xs: 12 }}>
+                    <Field
+                      as={TextField}
+                      name="state"
+                      label="state"
+                      fullWidth
+                      variant="outlined"
+                      error={!ErrorMessage("streetAddress")}
+                      helperText={
+                        <ErrorMessage name="streetAddress">
+                          {(msg) => <span className='text-red-600'>{msg}</span>}
+                        </ErrorMessage>
+                      }
+                    />
 
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    name="city"
-                    label="city"
-                    fullWidth
-                    variant="outlined"
-                    error={!ErrorMessage("streetAddress")}
-                    helperText={
-                      <ErrorMessage name="streetAddress">
-                        {(msg) => <span className='text-red-600'>{msg}</span>}
-                      </ErrorMessage>
-                    }
-                  />
+                  </Grid>
+                  <Grid item size={{ xs: 12 }}>
+                    <Field
+                      as={TextField}
+                      name="city"
+                      label="city"
+                      fullWidth
+                      variant="outlined"
+                      error={!ErrorMessage("streetAddress")}
+                      helperText={
+                        <ErrorMessage name="streetAddress">
+                          {(msg) => <span className='text-red-600'>{msg}</span>}
+                        </ErrorMessage>
+                      }
+                    />
 
+                  </Grid>
+                  <Grid item size={{ xs: 12 }}>
+                    <Field
+                      as={TextField}
+                      name="postalCode"
+                      label="postalCode"
+                      fullWidth
+                      variant="outlined"
+                      error={!ErrorMessage("streetAddress")}
+                      helperText={
+                        <ErrorMessage name="streetAddress">
+                          {(msg) => <span className='text-red-600'>{msg}</span>}
+                        </ErrorMessage>
+                      }
+                    />
+                  </Grid>
+                  <Grid item size={{ xs: 12 }}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel id="country-label">Country</InputLabel>
+                      <Field
+                        as={Select}
+                        labelId="country-label"
+                        id="country"
+                        name="country"
+                        label="Country"
+                      >
+                        <MenuItem value="United States">United States</MenuItem>
+                        <MenuItem value="Canada">Canada</MenuItem>
+                        <MenuItem value="Vietnam">Vietnam</MenuItem>
+                      </Field>
+                    </FormControl>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    name="pincode"
-                    label="pincode"
-                    fullWidth
-                    variant="outlined"
-                    error={!ErrorMessage("streetAddress")}
-                    helperText={
-                      <ErrorMessage name="streetAddress">
-                        {(msg) => <span className='text-red-600'>{msg}</span>}
-                      </ErrorMessage>
-                    }
-                  />
+                <Grid item size={{ xs: 12 }}>
+                  <Button fullWidth variant="contained" type="submit" color='primary'>Add Address</Button>
                 </Grid>
-                <Grid item xs={12}>
-                  <Button fullWidth variant="contained" type="submit" color='primary'>Delivery Here</Button>
-                </Grid>
-              </Grid>
             </Form>
-
-          </Formik>
-        </Box>
-      </Modal>
+        </Formik>
+      </Box>
+    </Modal >
     </>
   )
 }
