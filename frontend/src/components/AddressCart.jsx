@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, IconButton, TextField } from '@mui/material';
+import { Button, Card, FormControl, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -69,15 +69,21 @@ const AddressCard = ({
                                 onChange={handleChange}
                                 InputProps={{ className: "text-white" }}
                             />
-                            <TextField
-                                label="Country"
-                                variant="standard"
-                                fullWidth
-                                name="country"
-                                value={editedAddress.country}
-                                onChange={handleChange}
-                                InputProps={{ className: "text-white" }}
-                            />
+                            <FormControl variant="standard" fullWidth>
+                                <InputLabel id="country-label" className="text-white">Country</InputLabel>
+                                <Select
+                                    labelId="country-label"
+                                    name="country"
+                                    value={editedAddress.country}
+                                    onChange={handleChange}
+                                    label="Country"
+                                    inputProps={{ className: "text-white" }}
+                                >
+                                    <MenuItem value="United States">United States</MenuItem>
+                                    <MenuItem value="Canada">Canada</MenuItem>
+                                    <MenuItem value="Vietnam">Vietnam</MenuItem>
+                                </Select>
+                            </FormControl>
                         </>
                     ) : (
                         <>
