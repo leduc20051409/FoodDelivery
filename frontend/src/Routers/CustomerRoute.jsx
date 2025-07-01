@@ -10,8 +10,9 @@ import PaymentSuccess from '../components/PaymentSuccess/PaymentSuccess'
 import Search from '../components/Search/Search'
 import CheckoutPage from '../components/Order/CheckoutPage.'
 import ResetPasswordForm from '../components/auth/ResetPasswordForm'
-import MainLayout from '../components/layout/MainLayout'
-import EmptyLayout from '../components/layout/EmptyLayout'
+import EmptyLayout from '../layout/EmptyLayout'
+import MainLayout from '../layout/MainLayout'
+
 const CustomerRoute = () => {
     return (
         <div>
