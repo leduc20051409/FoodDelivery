@@ -1,0 +1,55 @@
+{
+  "name": "Tiramisu",
+  "description": "Classic Italian dessert made with layers of coffee-soaked ladyfingers and mascarpone cheese.",
+  "price": 90000,
+  "category": {
+    "id": 5,
+    "name": "Dessert"
+  },
+  "images": [
+    "https://example.com/images/tiramisu.jpg"
+  ],
+  "restaurantId": 1,
+  "vegetarian": true,
+  "seasonal": false,
+  "ingredientItems": [
+    {
+      "id": 9,
+      "name": "Mascarpone Cheese",
+      "category": {
+        "id": 4,
+        "name": "Cheese"
+      },
+      "isStoke": true
+    },
+    {
+      "id": 10,
+      "name": "Ladyfingers",
+      "category": {
+        "id": 7,
+        "name": "Biscuit"
+      },
+      "isStoke": true
+    },
+    {
+      "id": 11,
+      "name": "Espresso",
+      "category": {
+        "id": 8,
+        "name": "Coffee"
+      },
+      "isStoke": true
+    },
+    {
+      "id": 12,
+      "name": "Cocoa Powder",
+      "category": {
+        "id": 9,
+        "name": "Powder"
+      },
+      "isStoke": true
+    }
+  ]
+}
+
+
