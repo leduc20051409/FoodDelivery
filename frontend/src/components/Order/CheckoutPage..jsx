@@ -147,7 +147,7 @@ const CheckoutPage = () => {
                   checked={method === 'Razorpay'}
                   size="small"
                 />
-                <img className="h-6" src={logo.razorpay_logo} alt="Razorpay" />
+                <img className="h-6" src={logo.vnPay_logo} alt="Razorpay" />
               </div>
             </Paper>
 
