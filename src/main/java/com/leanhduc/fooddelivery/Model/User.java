@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -27,6 +29,7 @@ public class User {
 
     @JsonIgnore
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @JsonIgnore
@@ -42,6 +45,14 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_auth_providers", joinColumns = @JoinColumn(name = "user_id"))
+    private Set<AuthProvider> authProviders = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    private ProviderType primaryAuthMethod;
+
     private String status;
 
     private String phoneNumber;

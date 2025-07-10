@@ -3,6 +3,8 @@ package com.leanhduc.fooddelivery.Advices;
 import com.leanhduc.fooddelivery.Exception.AlreadyExistsException;
 import com.leanhduc.fooddelivery.Exception.InvalidParamException;
 import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
+import com.leanhduc.fooddelivery.Exception.UnauthorizedAccessException;
+import com.leanhduc.fooddelivery.Response.AuthResponse;
 import com.leanhduc.fooddelivery.Response.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,12 @@ public class GlobalExceptionHandle {
         );
 
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<AuthResponse> handleUnauthorized(UnauthorizedAccessException ex) {
+        AuthResponse response = new AuthResponse(null, ex.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)

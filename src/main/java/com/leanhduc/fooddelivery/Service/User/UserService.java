@@ -66,6 +66,7 @@ public class UserService implements IUserService {
         Cart cart = new Cart();
         cart.setCustomer(savedUser);
         cartRepository.save(cart);
+        savedUser.setCart(cart);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(auth);
