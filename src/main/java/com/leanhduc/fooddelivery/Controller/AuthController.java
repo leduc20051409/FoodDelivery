@@ -1,5 +1,7 @@
 package com.leanhduc.fooddelivery.Controller;
 
+import com.leanhduc.fooddelivery.RequestDto.GoogleAuthRequest;
+import com.leanhduc.fooddelivery.RequestDto.GoogleCallbackRequest;
 import com.leanhduc.fooddelivery.RequestDto.LoginRequest;
 import com.leanhduc.fooddelivery.RequestDto.RegisterRequest;
 import com.leanhduc.fooddelivery.Response.AuthResponse;
@@ -47,24 +49,31 @@ public class AuthController {
             @RequestParam String newPassword) {
         String email = authService.resetPassword(token, newPassword);
         return new ResponseEntity<>(
-                new ResetPasswordResponse("Password reset successful",email),
+                new ResetPasswordResponse("Password reset successful", email),
                 HttpStatus.OK
         );
     }
 
     @GetMapping ("/verify-reset-token/{token}")
     public ResponseEntity<ResetPasswordResponse> verifyResetToken(@PathVariable String token) {
-        try {
-            String email = authService.verifyResetToken(token);
-            return new ResponseEntity<>(
-                    new ResetPasswordResponse("Token is valid, you can reset your password", email),
-                    HttpStatus.OK
-            );
-        } catch (Exception e) {
-            return new ResponseEntity<>(
-                    new ResetPasswordResponse("Token is invalid or expired", null),
-                    HttpStatus.BAD_REQUEST
-            );
-        }
+        String email = authService.verifyResetToken(token);
+        return new ResponseEntity<>(
+                new ResetPasswordResponse("Token is valid, you can reset your password", email),
+                HttpStatus.OK
+        );
+
+    }
+
+//    @PostMapping ("/google")
+//    public ResponseEntity<AuthResponse> googleAuth(@RequestBody GoogleAuthRequest request) {
+//        AuthResponse response = authService.authenticateWithGoogle(request.getAccessToken());
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//
+//    }
+
+    @PostMapping("/google/callback")
+    public ResponseEntity<AuthResponse> googleCallback(@RequestBody GoogleCallbackRequest request) {
+        AuthResponse response = authService.authenticateWithGoogle(request.getCode(), request.getRedirectUri());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
