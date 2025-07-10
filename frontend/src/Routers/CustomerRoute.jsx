@@ -10,14 +10,17 @@ import PaymentSuccess from '../components/PaymentSuccess/PaymentSuccess'
 import Search from '../components/Search/Search'
 import CheckoutPage from '../components/Order/CheckoutPage.'
 import ResetPasswordForm from '../components/auth/ResetPasswordForm'
-import MainLayout from '../components/layout/MainLayout'
-import EmptyLayout from '../components/layout/EmptyLayout'
+import EmptyLayout from '../layout/EmptyLayout'
+import MainLayout from '../layout/MainLayout'
+import GoogleCallback from '../components/auth/GoogleCallback'
+
 const CustomerRoute = () => {
     return (
         <div>
             <Routes>
                 <Route element={<EmptyLayout />}>
                     <Route path="/auth/reset-password/:token" element={<ResetPasswordForm />} />
+                    <Route path="/login/oauth2/code/google" element={<GoogleCallback />} />
                 </Route>
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<Home />} />

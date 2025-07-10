@@ -3,10 +3,11 @@ import { Formik, Form, Field } from 'formik';
 import { Button, TextField, Typography, Divider } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { loginUser } from '../../State/Customer/Authentication/Action';
+import { loginUser, loginWithGoogle } from '../../State/Customer/Authentication/Action';
 import GoogleIcon from '@mui/icons-material/Google'; 
 import FacebookIcon from '@mui/icons-material/Facebook'; 
 import { styled } from '@mui/material/styles';
+
 
 
 const OAuthButton = styled(Button)(({ theme }) => ({
@@ -29,13 +30,38 @@ const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+ 
+
   const handleSubmit = (values) => {
     dispatch(loginUser({ userData: values, navigate }));
   };
 
  
   const handleOAuthLogin = (provider) => {
-    console.log(`Logging in with ${provider}...`); 
+    if (provider === 'google') {
+      const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+      
+      if (!googleClientId) {
+        console.error('Google Client ID is not configured');
+        return;
+      }
+
+      const redirectUri = 'http://localhost:5173/login/oauth2/code/google';
+      const scope = 'openid profile email';
+      
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${googleClientId}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `response_type=code&` +
+        `scope=${encodeURIComponent(scope)}&` +
+        `access_type=offline&` +
+        `prompt=select_account`;
+
+      console.log('Redirecting to Google OAuth...');
+      window.location.href = googleAuthUrl;
+    } else {
+      console.log(`Logging in with ${provider}...`);
+    }
   };
 
   return (
@@ -99,16 +125,6 @@ const LoginForm = () => {
           onClick={() => handleOAuthLogin('google')}
         >
           Continue with Google
-        </OAuthButton>
-
-        <OAuthButton
-          fullWidth
-          variant="outlined"
-          startIcon={<FacebookIcon />}
-          onClick={() => handleOAuthLogin('facebook')}
-          sx={{ mt: 1 }}
-        >
-          Continue with Facebook
         </OAuthButton>
       </div>
     </>

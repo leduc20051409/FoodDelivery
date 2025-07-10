@@ -25,7 +25,7 @@ export const getAllCartItems = (reqData) => {
     return async (dispatch) => {
         dispatch({ type: GET_ALL_CART_ITEMS_REQUEST });
         try {
-            const response = await api.get(`/api/carts/${reqData.cartId}/items`, {
+            const response = await api.get(`/api/cart/items`, {
                 headers: {
                     Authorization: `Bearer ${reqData.token}`,
                 },
@@ -48,6 +48,7 @@ export const addItemToCart = (reqData) => {
             });
             console.log("add item to cart ", data)
             dispatch({ type: ADD_ITEM_TO_CART_SUCCESS, payload: data });
+            dispatch(findCart(reqData.token));
 
         } catch (error) {
             console.log("catch error ", error)
@@ -67,6 +68,7 @@ export const updateCartItem = (reqData) => {
             });
             console.log("update cartItem ", data)
             dispatch({ type: UPDATE_CARTITEM_SUCCESS, payload: data });
+            dispatch(findCart(reqData.jwt));
 
         } catch (error) {
             console.log("catch error ", error)
@@ -79,13 +81,14 @@ export const removeCartItem = ({ cartItemId, jwt }) => {
     return async (dispatch) => {
         dispatch({ type: REMOVE_CARTITEM_REQUEST });
         try {
-            const { data } = await api.delete(`/api/cart-item/${cartItemId}/remove`, {
+            const { data } = await api.delete(`/api/cart/cart-item/${cartItemId}/remove`, {
                 headers: {
                     Authorization: `Bearer ${jwt}`,
                 },
             });
             console.log("remove cartItem ", data)
             dispatch({ type: REMOVE_CARTITEM_SUCCESS, payload: cartItemId });
+            dispatch(findCart(jwt));
 
         } catch (error) {
             console.log("catch error ", error)

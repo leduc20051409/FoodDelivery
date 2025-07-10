@@ -12,13 +12,15 @@ const RestaurantCard = ({ item }) => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("token");
     const { auth } = useSelector(store => store);
-    const address = `${item.address.streetAddress}, ${item.address.city}, ${item.address.stateProvince}, ${item.address.country}`;
+    const address = item.address
+      ? `${item.address.streetAddress}, ${item.address.city}, ${item.address.stateProvince}, ${item.address.country}`
+      : item.title;
 
     const hadleAddToFavorite = () => {
         dispatch(addToFavourite({ restaurantId: item.id, jwt }));
     };
     const handleNavigateToRestaurant = () => {
-        if(!item.open) return;
+        if (!item.open) return;
         navigate(`/restaurant/${item.address.city}/${item.name}/${item.id}`);
     }
 
@@ -41,17 +43,18 @@ const RestaurantCard = ({ item }) => {
                 <div className="space-y-1">
                     <p
                         onClick={handleNavigateToRestaurant}
-                        className={`font-semibold text-lg ${
-                            item.open 
-                                ? "cursor-pointer" 
+                        className={`font-semibold text-lg ${item.open
+                                ? "cursor-pointer"
                                 : "cursor-not-allowed text-gray-500"
-                        }`}
+                            }`}
                     >
                         {item.name}
                     </p>
-                    <p className="text-gray-500 text-sm">
-                        {address}
-                    </p>
+                    {address && (
+                        <p className="text-gray-500 text-sm">
+                            {address}
+                        </p>
+                    )}
                 </div>
                 <div>
                     <IconButton onClick={hadleAddToFavorite}>

@@ -74,7 +74,7 @@ const ResetPasswordForm = () => {
 
   const handleSubmit = (values) => {
     dispatch(resetPassword({ token: token, newPassword: values.password }));
-    console.log('Password changed for user:', email , 'New Password:', values.password);
+    console.log('Password changed for user:', email, 'New Password:', values.password);
     setTimeout(() => {
       setSuccess(true);
     }, 1000);
@@ -129,7 +129,7 @@ const ResetPasswordForm = () => {
       <Box sx={{ textAlign: 'center', mb: 3 }}>
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', }}>
           <img
-            src={logo.website_logo}
+            src={logo.dinner_logo}
             alt="Website Logo"
             style={{ maxWidth: '150px', height: 'auto' }}
           />

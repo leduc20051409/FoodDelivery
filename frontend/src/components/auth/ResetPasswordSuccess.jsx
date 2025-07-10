@@ -2,6 +2,7 @@
 import React from 'react';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { Box, Button, Typography, Container } from '@mui/material';
+import { logo } from '../../assets/logo';
 
 const ResetPasswordSuccess = ({ onReturnToSignIn }) => {
   return (
@@ -15,8 +16,12 @@ const ResetPasswordSuccess = ({ onReturnToSignIn }) => {
       }}
     >
       <Box sx={{ textAlign: 'center', mb: 3 }}>
-        <Box sx={{ mb: 2 }}>
-          <GitHubIcon sx={{ fontSize: '4rem', color: 'text.primary' }} />
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+          <img
+            src={logo.dinner_logo}
+            alt="Website Logo"
+            style={{ maxWidth: '150px', height: 'auto' }}
+          />
         </Box>
         <Typography
           variant="h6"
