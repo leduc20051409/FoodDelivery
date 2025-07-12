@@ -186,6 +186,7 @@ public class UserService implements IUserService {
         newAddress.setStateProvince(address.getStateProvince());
         newAddress.setPostalCode(address.getPostalCode());
         newAddress.setCountry(address.getCountry());
+        newAddress.setPhoneNumber(address.getPhoneNumber());
         newAddress.setUser(user);
 
         Address savedAddress = addressRepository.save(newAddress);
