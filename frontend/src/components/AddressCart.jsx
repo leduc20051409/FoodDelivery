@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import PhoneIcon from '@mui/icons-material/Phone';
 
 const AddressCard = ({
     item,
@@ -69,6 +70,16 @@ const AddressCard = ({
                                 onChange={handleChange}
                                 InputProps={{ className: "text-white" }}
                             />
+                            <TextField
+                                label="Phone Number"
+                                variant="standard"
+                                fullWidth
+                                name="phoneNumber"
+                                value={editedAddress.phoneNumber || ''}
+                                onChange={handleChange}
+                                InputProps={{ className: "text-white" }}
+                                placeholder="e.g. +1 234 567 8901"
+                            />
                             <FormControl variant="standard" fullWidth>
                                 <InputLabel id="country-label" className="text-white">Country</InputLabel>
                                 <Select
@@ -91,6 +102,11 @@ const AddressCard = ({
                             <p className="text-neutral-400 text-sm">
                                 {item.streetAddress}, {item.stateProvince}, <br />{item.country}, {item.postalCode}
                             </p>
+                            <p className="text-neutral-400 text-sm flex items-center gap-1 mt-1">
+                                <PhoneIcon color="primary" className="w-4 h-3" />
+                                {item.phoneNumber}
+                            </p>
+
                         </>
                     )}
                 </div>
