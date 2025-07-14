@@ -11,7 +11,6 @@ const AddressCard = ({
     item,
     showButton,
     handleSelectAddress,
-    navigateToCheckOut,
     handleEditAddress,
     handleDeleteAddress,
 }) => {
@@ -118,7 +117,6 @@ const AddressCard = ({
                         fullWidth
                         onClick={() => {
                             handleSelectAddress(item);
-                            navigateToCheckOut();
                         }}
                         className="rounded-md border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition"
                     >

@@ -10,6 +10,7 @@ import { createOrder } from '../State/Customer/Orders/Action';
 import { useNavigate } from 'react-router-dom';
 import { addAddress, deleteAddress, getAddresses, updateAddress } from '../State/Customer/Addresses/Action ';
 import { clearCartAction } from '../State/Customer/Cart/Action';
+import { isSameRestaurant } from '../components/config/Logic';
 
 export const style = {
   position: 'absolute',
@@ -51,8 +52,13 @@ const Cart = () => {
     setOpen(true);
   };
   const createOrderUsingAddress = (address) => {
-    dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
-    navigate('/cart/checkout');
+    if (!isSameRestaurant(cart.cartItems)) {
+      alert('Your cart contains items from different restaurants.');
+      return;
+    } else {
+      dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
+      navigate('/cart/checkout');
+    }
   }
   const handleSubmit = (values) => {
     const data = {
@@ -172,7 +178,6 @@ const Cart = () => {
             <div className="flex gap-5 flex-wrap justify-center">
               {addresses.addresses.map((item) => (
                 <AddressCart
-                  navigateToCheckOut={() => navigate('/cart/checkout')}
                   handleSelectAddress={createOrderUsingAddress}
                   item={item}
                   showButton={true}
