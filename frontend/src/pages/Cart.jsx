@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createOrder } from '../State/Customer/Orders/Action';
 import { useNavigate } from 'react-router-dom';
 import { addAddress, deleteAddress, getAddresses, updateAddress } from '../State/Customer/Addresses/Action ';
+import { clearCartAction } from '../State/Customer/Cart/Action';
+import { isSameRestaurant } from '../components/config/Logic';
 
 export const style = {
   position: 'absolute',
@@ -30,6 +32,7 @@ const Cart = () => {
     postalCode: '',
     city: '',
     country: '',
+    phoneNumber: '',
   }
   const validateSchema = Yup.object().shape({
     streetAddress: Yup.string().required('Required'),
@@ -49,8 +52,13 @@ const Cart = () => {
     setOpen(true);
   };
   const createOrderUsingAddress = (address) => {
-    dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
-    navigate('/cart/checkout');
+    if (!isSameRestaurant(cart.cartItems)) {
+      alert('Your cart contains items from different restaurants.');
+      return;
+    } else {
+      dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
+      navigate('/cart/checkout');
+    }
   }
   const handleSubmit = (values) => {
     const data = {
@@ -77,6 +85,7 @@ const Cart = () => {
       stateProvince: values.state,
       postalCode: values.postalCode,
       country: values.country,
+      phoneNumber: values.phoneNumber
     };
     dispatch(addAddress(addressData, jwt));
     console.log('Adding address:', addressData);
@@ -92,7 +101,10 @@ const Cart = () => {
     console.log('Deleting address:', address);
   };
 
-  
+  const handleClearCart = () => {
+    dispatch(clearCartAction());
+  };
+
   useEffect(() => {
     dispatch(getAddresses(jwt));
     console.log('auth', auth);
@@ -111,31 +123,51 @@ const Cart = () => {
     <>
       <main className="lg:flex justify-between">
         <section className="lg:w-[30%] space-y-6 lg:min-h-screen pt-10">
-          {cart?.cartItems.map((item) => <CartItem item={item} />)}
-          <Divider />
-          <div className="billlDetails px-5 text-sm">
-            <p className="font-extralight py-5">Bill Details</p>
-            <div className="space-y-3">
-              <div className="flex justify-between text-gray-400">
-                <p>Item Total</p>
-                <p>${cart.cart.total}</p>
+          {cart.cartItems.length === 0 ? (
+            <Typography className="p-10 text-center text-gray-500">
+              Your cart is empty. Please add items to your cart.
+            </Typography>
+          ) : (
+            <>
+              <div className="px-5 space-y-4 max-h-[70vh] overflow-y-auto">
+                {cart.cartItems.map(item => (
+                  <CartItem key={item.id} item={item} />
+                ))}
               </div>
-              <div className="flex justify-between text-gray-400">
-                <p>Delivey Fee</p>
-                <p>$21</p>
+              <Divider className="my-4" />
+              <div className="billlDetails px-5 text-sm">
+                <p className="font-extralight py-5">Bill Details</p>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-gray-400">
+                    <p>Item Total</p>
+                    <p>${cart.cart.total}</p>
+                  </div>
+                  <div className="flex justify-between text-gray-400">
+                    <p>Delivey Fee</p>
+                    <p>$21</p>
+                  </div>
+                  <div className="flex justify-between text-gray-400">
+                    <p>GST and Reataurant Charges</p>
+                    <p>$33</p>
+                  </div>
+                  <Divider />
+                </div>
+                <div className="flex justify-between text-gray-400 ">
+                  <p>Total pay</p>
+                  <Divider orientation="vertical" />
+                  <p className="font-bold text-red-500 text-lg">${cart.cart.total + 54}</p>
+                </div>
               </div>
-              <div className="flex justify-between text-gray-400">
-                <p>GST and Reataurant Charges</p>
-                <p>$33</p>
-              </div>
-              <Divider />
-            </div>
-            <div className="flex justify-between text-gray-400 ">
-              <p>Total pay</p>
-              <Divider orientation="vertical" />
-              <p className="font-bold text-red-500 text-lg">${cart.cart.total + 54}</p>
-            </div>
-          </div>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleClearCart}
+              >
+                Clear Cart
+              </Button>
+
+            </>
+          )}
         </section>
         <Divider orientation="vertical" flexItem />
         <section className="lg:w-[70%] flex justify-center px-5 pb-10 lg:pb-0">
@@ -146,7 +178,6 @@ const Cart = () => {
             <div className="flex gap-5 flex-wrap justify-center">
               {addresses.addresses.map((item) => (
                 <AddressCart
-                  navigateToCheckOut={() => navigate('/cart/checkout')}
                   handleSelectAddress={createOrderUsingAddress}
                   item={item}
                   showButton={true}
@@ -171,101 +202,115 @@ const Cart = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={style} className="bg-zinc-900">
           <Formik
             initialValues={intitalValue}
             validationSchema={validateSchema}
             onSubmit={handleAddAddress}
           >
-              <Form>
-                <Grid container spacing={2}>
-                  <Grid item size={{ xs: 12 }}>
-                    <Field
-                      as={TextField}
-                      name="streetAddress"
-                      label="Street Address"
-                      fullWidth
-                      variant="outlined"
-                      error={!ErrorMessage("streetAddress")}
-                      helperText={
-                        <ErrorMessage name="streetAddress">
-                          {(msg) => <span className='text-red-600'>{msg}</span>}
-                        </ErrorMessage>
-                      }
-                    />
+            <Form>
+              <Grid container spacing={2}>
+                <Grid item size={{ xs: 12 }}>
+                  <Field
+                    as={TextField}
+                    name="streetAddress"
+                    label="Street Address"
+                    fullWidth
+                    variant="outlined"
+                    error={!ErrorMessage("streetAddress")}
+                    helperText={
+                      <ErrorMessage name="streetAddress">
+                        {(msg) => <span className='text-red-600'>{msg}</span>}
+                      </ErrorMessage>
+                    }
+                  />
 
-                  </Grid>
-                  <Grid item size={{ xs: 12 }}>
-                    <Field
-                      as={TextField}
-                      name="state"
-                      label="state"
-                      fullWidth
-                      variant="outlined"
-                      error={!ErrorMessage("streetAddress")}
-                      helperText={
-                        <ErrorMessage name="streetAddress">
-                          {(msg) => <span className='text-red-600'>{msg}</span>}
-                        </ErrorMessage>
-                      }
-                    />
-
-                  </Grid>
-                  <Grid item size={{ xs: 12 }}>
-                    <Field
-                      as={TextField}
-                      name="city"
-                      label="city"
-                      fullWidth
-                      variant="outlined"
-                      error={!ErrorMessage("streetAddress")}
-                      helperText={
-                        <ErrorMessage name="streetAddress">
-                          {(msg) => <span className='text-red-600'>{msg}</span>}
-                        </ErrorMessage>
-                      }
-                    />
-
-                  </Grid>
-                  <Grid item size={{ xs: 12 }}>
-                    <Field
-                      as={TextField}
-                      name="postalCode"
-                      label="postalCode"
-                      fullWidth
-                      variant="outlined"
-                      error={!ErrorMessage("streetAddress")}
-                      helperText={
-                        <ErrorMessage name="streetAddress">
-                          {(msg) => <span className='text-red-600'>{msg}</span>}
-                        </ErrorMessage>
-                      }
-                    />
-                  </Grid>
-                  <Grid item size={{ xs: 12 }}>
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel id="country-label">Country</InputLabel>
-                      <Field
-                        as={Select}
-                        labelId="country-label"
-                        id="country"
-                        name="country"
-                        label="Country"
-                      >
-                        <MenuItem value="United States">United States</MenuItem>
-                        <MenuItem value="Canada">Canada</MenuItem>
-                        <MenuItem value="Vietnam">Vietnam</MenuItem>
-                      </Field>
-                    </FormControl>
-                  </Grid>
                 </Grid>
                 <Grid item size={{ xs: 12 }}>
-                  <Button fullWidth variant="contained" type="submit" color='primary'>Add Address</Button>
+                  <Field
+                    as={TextField}
+                    name="state"
+                    label="state"
+                    fullWidth
+                    variant="outlined"
+                    error={!ErrorMessage("streetAddress")}
+                    helperText={
+                      <ErrorMessage name="streetAddress">
+                        {(msg) => <span className='text-red-600'>{msg}</span>}
+                      </ErrorMessage>
+                    }
+                  />
+
                 </Grid>
+                <Grid item size={{ xs: 12 }}>
+                  <Field
+                    as={TextField}
+                    name="city"
+                    label="city"
+                    fullWidth
+                    variant="outlined"
+                    error={!ErrorMessage("streetAddress")}
+                    helperText={
+                      <ErrorMessage name="streetAddress">
+                        {(msg) => <span className='text-red-600'>{msg}</span>}
+                      </ErrorMessage>
+                    }
+                  />
+
+                </Grid>
+                <Grid item size={{ xs: 12 }}>
+                  <Field
+                    as={TextField}
+                    name="postalCode"
+                    label="postalCode"
+                    fullWidth
+                    variant="outlined"
+                    error={!ErrorMessage("streetAddress")}
+                    helperText={
+                      <ErrorMessage name="streetAddress">
+                        {(msg) => <span className='text-red-600'>{msg}</span>}
+                      </ErrorMessage>
+                    }
+                  />
+                </Grid>
+                <Grid item size={{ xs: 12 }}>
+                  <Field
+                    as={TextField}
+                    name="phoneNumber"
+                    label="Phone Number"
+                    fullWidth
+                    variant="outlined"
+                    error={!ErrorMessage("phoneNumber")}
+                    helperText={
+                      <ErrorMessage name="phoneNumber">
+                        {msg => <span className='text-red-600'>{msg}</span>}
+                      </ErrorMessage>}
+                    placeholder="e.g. +84 123 456 789" />
+                </Grid>
+                <Grid item size={{ xs: 12 }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="country-label">Country</InputLabel>
+                    <Field
+                      as={Select}
+                      labelId="country-label"
+                      id="country"
+                      name="country"
+                      label="Country"
+                    >
+                      <MenuItem value="United States">United States</MenuItem>
+                      <MenuItem value="Canada">Canada</MenuItem>
+                      <MenuItem value="Vietnam">Vietnam</MenuItem>
+                    </Field>
+                  </FormControl>
+                </Grid>
+              </Grid>
+              <Grid item size={{ xs: 12 }}>
+                <Button fullWidth variant="contained" type="submit" color='primary'>Add Address</Button>
+              </Grid>
             </Form>
-        </Formik>
-      </Box>
-    </Modal >
+          </Formik>
+        </Box>
+      </Modal >
     </>
   )
 }

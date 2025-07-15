@@ -8,11 +8,12 @@ import NavBar from '../components/NavBar'
 import RestaurentDetail from '../pages/RestaurentDetail'
 import PaymentSuccess from '../components/PaymentSuccess/PaymentSuccess'
 import Search from '../components/Search/Search'
-import CheckoutPage from '../components/Order/CheckoutPage.'
+
 import ResetPasswordForm from '../components/auth/ResetPasswordForm'
 import EmptyLayout from '../layout/EmptyLayout'
 import MainLayout from '../layout/MainLayout'
 import GoogleCallback from '../components/auth/GoogleCallback'
+import CheckoutPage from '../pages/CheckoutPage.'
 
 const CustomerRoute = () => {
     return (

@@ -13,11 +13,25 @@ export const createOrder = (reqData) => {
                     Authorization: `Bearer ${reqData.token}`,
                 },
             });
-            if (data.payment_url) {
-                window.location.href = data.payment_url;
+            const paymentMethod = reqData.order.paymentMethod;
+            if (paymentMethod === 'CASH_ON_DELIVERY') {
+                dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
+                if (reqData.navigate) {
+                    reqData.navigate('/my-profile/orders', { state: { order: data } });
+                }
+            } else {
+                dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
+                const paymentUrl = data.payment_url || data.payment_link_url || data.paymentUrl;
+
+                if (paymentUrl) {
+                    window.location.href = paymentUrl;
+                } else {
+                    console.error('Payment URL not found in response');
+                    throw new Error('Payment URL not found in response');
+                }
+                console.log("created order data", data)
+                dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
             }
-            console.log("created order data", data)
-            dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
         } catch (error) {
             console.log("error ", error)
             dispatch({ type: CREATE_ORDER_FAILURE, payload: error });

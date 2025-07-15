@@ -1,20 +1,54 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Title from '../Title'
-import { logo } from '../../assets/logo'
-import CartTotals from './CartTotals'
+import { logo } from '../assets/logo'
+import CartTotals from '../components/Order/CartTotals'
 import { Button, TextField, Paper, Box, Typography, Radio, Divider } from '@mui/material'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { createOrder } from '../State/Customer/Orders/Action'
+import Title from '../components/Title'
 
 const CheckoutPage = () => {
-  const { auth, cart } = useSelector(store => store);
-  const [method, setMethod] = useState("cod");
+  const { auth, cart, order } = useSelector(store => store);
+  const [method, setMethod] = useState("CASH_ON_DELIVERY");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log("auth", auth);
     console.log("cart", cart);
   }, [auth]);
+
+   useEffect(() => {
+    if (order.currentOrder && method === 'CASH_ON_DELIVERY') {
+      // Navigate to success page for COD orders
+      navigate('/my-profile/orders', { state: { order: order.currentOrder } });
+    }
+  }, [order.currentOrder, method, navigate]);
+
+  const placeOrder = () => {
+    const orderData = {
+      restaurantId: cart.cartItems[0].food.restaurant.id,
+      deliveryAddress: {
+        fullName: auth.user?.fullName,
+        streetAddress: auth.selectedAddress?.streetAddress,
+        city: auth.selectedAddress?.city,
+        stateProvince: auth.selectedAddress?.stateProvince,
+        postalCode: auth.selectedAddress?.postalCode,
+        country: auth.selectedAddress?.country,
+        phoneNumber: auth.selectedAddress?.phoneNumber,
+      },
+      paymentMethod: method,
+      paymentTransactionId: null,
+    };
+
+    const reqData = {
+      order: orderData,
+      token: localStorage.getItem("token"),
+      navigate: navigate 
+    };
+    dispatch(createOrder(reqData));
+    console.log("Order Data: ", orderData);
+  }
 
   return (
     <Box className='container mx-auto px-4 py-8'>
@@ -101,6 +135,7 @@ const CheckoutPage = () => {
             <TextField
               fullWidth
               label="Phone Number"
+              value={auth.selectedAddress?.phoneNumber || ''}
               variant="outlined"
               type="tel"
               size="small"
@@ -112,7 +147,7 @@ const CheckoutPage = () => {
         {/* Right side - Payment and Order Summary */}
         <Paper elevation={3} className="flex-1 p-6 max-w-md">
           <Box className="mb-8">
-            <CartTotals item={cart.cart}/>
+            <CartTotals item={cart.cart} />
           </Box>
 
           <Divider className="my-6" />
@@ -124,41 +159,41 @@ const CheckoutPage = () => {
           {/* Payment Method Selection */}
           <Box className="space-y-3">
             <Paper
-              onClick={() => setMethod("stripe")}
-              elevation={method === 'stripe' ? 2 : 0}
-              className={`p-4 cursor-pointer transition-all ${method === 'stripe' ? 'border-2 border-green-500' : 'border'}`}
+              onClick={() => setMethod("STRIPE_PAY")}
+              elevation={method === 'STRIPE_PAY' ? 2 : 0}
+              className={`p-4 cursor-pointer transition-all ${method === 'STRIPE_PAY' ? 'border-2 border-green-500' : 'border'}`}
             >
               <div className="flex items-center gap-3">
                 <Radio
-                  checked={method === 'stripe'}
+                  checked={method === 'STRIPE_PAY'}
                   size="small"
                 />
-                <img className="h-6" src={logo.stripe_logo} alt="Stripe" />
+                <img className="h-6" src={logo.stripe_logo} alt="STRIPE_PAY" />
               </div>
             </Paper>
 
             <Paper
-              onClick={() => setMethod("Razorpay")}
-              elevation={method === 'Razorpay' ? 2 : 0}
-              className={`p-4 cursor-pointer transition-all ${method === 'Razorpay' ? 'border-2 border-green-500' : 'border'}`}
+              onClick={() => setMethod("VN_PAY")}
+              elevation={method === 'VN_PAY' ? 2 : 0}
+              className={`p-4 cursor-pointer transition-all ${method === 'VN_PAY' ? 'border-2 border-green-500' : 'border'}`}
             >
               <div className="flex items-center gap-3">
                 <Radio
-                  checked={method === 'Razorpay'}
+                  checked={method === 'VN_PAY'}
                   size="small"
                 />
-                <img className="h-6" src={logo.vnPay_logo} alt="Razorpay" />
+                <img className="h-6" src={logo.vnPay_logo} alt="VN_PAY" />
               </div>
             </Paper>
 
             <Paper
-              onClick={() => setMethod("cod")}
-              elevation={method === 'cod' ? 2 : 0}
-              className={`p-4 cursor-pointer transition-all ${method === 'cod' ? 'border-2 border-green-500' : 'border'}`}
+              onClick={() => setMethod("CASH_ON_DELIVERY")}
+              elevation={method === 'CASH_ON_DELIVERY' ? 2 : 0}
+              className={`p-4 cursor-pointer transition-all ${method === 'CASH_ON_DELIVERY' ? 'border-2 border-green-500' : 'border'}`}
             >
               <div className="flex items-center gap-3">
                 <Radio
-                  checked={method === 'cod'}
+                  checked={method === 'CASH_ON_DELIVERY'}
                   size="small"
                 />
                 <Typography variant="body2" className="font-medium">
@@ -172,13 +207,13 @@ const CheckoutPage = () => {
             variant='contained'
             fullWidth
             size="large"
-            onClick={() => navigate("/order/confirm")}
+            onClick={placeOrder}
             sx={{
               mt: 4,
               py: 1.5,
-              backgroundColor: '#1976d2',
+              backgroundColor: '#e91e63',
               '&:hover': {
-                backgroundColor: '#1565c0'
+                backgroundColor: '#c2185b',
               }
             }}
           >
