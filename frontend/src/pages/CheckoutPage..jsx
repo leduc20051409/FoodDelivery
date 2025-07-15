@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Title from '../Title'
-import { logo } from '../../assets/logo'
-import CartTotals from './CartTotals'
+import { logo } from '../assets/logo'
+import CartTotals from '../components/Order/CartTotals'
 import { Button, TextField, Paper, Box, Typography, Radio, Divider } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
-import { createOrder } from '../../State/Customer/Orders/Action'
+import { createOrder } from '../State/Customer/Orders/Action'
+import Title from '../components/Title'
 
 const CheckoutPage = () => {
-  const { auth, cart } = useSelector(store => store);
+  const { auth, cart, order } = useSelector(store => store);
   const [method, setMethod] = useState("CASH_ON_DELIVERY");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -17,6 +17,13 @@ const CheckoutPage = () => {
     console.log("auth", auth);
     console.log("cart", cart);
   }, [auth]);
+
+   useEffect(() => {
+    if (order.currentOrder && method === 'CASH_ON_DELIVERY') {
+      // Navigate to success page for COD orders
+      navigate('/my-profile/orders', { state: { order: order.currentOrder } });
+    }
+  }, [order.currentOrder, method, navigate]);
 
   const placeOrder = () => {
     const orderData = {
@@ -33,7 +40,13 @@ const CheckoutPage = () => {
       paymentMethod: method,
       paymentTransactionId: null,
     };
-    //dispatch(createOrder(orderData));
+
+    const reqData = {
+      order: orderData,
+      token: localStorage.getItem("token"),
+      navigate: navigate 
+    };
+    dispatch(createOrder(reqData));
     console.log("Order Data: ", orderData);
   }
 
@@ -135,10 +148,6 @@ const CheckoutPage = () => {
         <Paper elevation={3} className="flex-1 p-6 max-w-md">
           <Box className="mb-8">
             <CartTotals item={cart.cart} />
-            {/* {cart.cart ? (
-            ) : (
-              <p>Loading cart data...</p>
-            )} */}
           </Box>
 
           <Divider className="my-6" />
