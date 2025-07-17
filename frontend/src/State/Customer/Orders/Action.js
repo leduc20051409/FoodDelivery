@@ -1,6 +1,6 @@
 
 import { api } from "../../../components/config/Api";
-import { CREATE_ORDER_FAILURE, CREATE_ORDER_REQUEST, CREATE_ORDER_SUCCESS, GET_USERS_NOTIFICATION_REQUEST, GET_USERS_ORDERS_FAILURE, GET_USERS_ORDERS_REQUEST, GET_USERS_ORDERS_SUCCESS } from "./ActionType";
+import { CANCEL_ORDER_FAILURE, CANCEL_ORDER_REQUEST, CANCEL_ORDER_SUCCESS, CREATE_ORDER_FAILURE, CREATE_ORDER_REQUEST, CREATE_ORDER_SUCCESS, GET_USERS_NOTIFICATION_REQUEST, GET_USERS_ORDERS_FAILURE, GET_USERS_ORDERS_REQUEST, GET_USERS_ORDERS_SUCCESS } from "./ActionType";
 import { GET_USERS_NOTIFICATION_FAILURE, GET_USERS_NOTIFICATION_SUCCESS } from "./ActionType";
 
 
@@ -35,6 +35,23 @@ export const createOrder = (reqData) => {
         } catch (error) {
             console.log("error ", error)
             dispatch({ type: CREATE_ORDER_FAILURE, payload: error });
+        }
+    };
+};
+
+export const cancelOrder = (orderId, jwt) => {
+    return async (dispatch) => {
+        dispatch({ type: CANCEL_ORDER_REQUEST });
+        try {
+            const { data } = await api.put(`/api/orders/order/cancel/${orderId}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${jwt}`,
+                },
+            });
+            console.log("cancelled order data", data);
+            dispatch({ type: CANCEL_ORDER_SUCCESS, payload: data });
+        } catch (error) {
+            dispatch({ type: CANCEL_ORDER_FAILURE, payload: error });
         }
     };
 };

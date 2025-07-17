@@ -1,5 +1,8 @@
 
 import {
+  CANCEL_ORDER_FAILURE,
+  CANCEL_ORDER_REQUEST,
+  CANCEL_ORDER_SUCCESS,
   CREATE_ORDER_FAILURE,
   CREATE_ORDER_REQUEST,
   CREATE_ORDER_SUCCESS,
@@ -7,6 +10,8 @@ import {
   GET_USERS_ORDERS_FAILURE,
   GET_USERS_ORDERS_REQUEST,
   GET_USERS_ORDERS_SUCCESS,
+  UPDATE_ORDER_FAILURE,
+  UPDATE_ORDER_REQUEST,
 } from "./ActionType";
 
 const initialState = {
@@ -20,6 +25,8 @@ const initialState = {
 export const orderReducer = (state = initialState, { type, payload }) => {
   switch (type) {
     case CREATE_ORDER_REQUEST:
+    case UPDATE_ORDER_REQUEST:
+    case CANCEL_ORDER_REQUEST:
       return {
         ...state,
         error: null,
@@ -34,15 +41,28 @@ export const orderReducer = (state = initialState, { type, payload }) => {
         ...state,
         error: null,
         loading: false,
-        currentOrder: isPaymentResponse ? null : payload, 
+        currentOrder: isPaymentResponse ? null : payload,
         paymentResponse: isPaymentResponse ? payload : null
       };
     }
     case CREATE_ORDER_FAILURE:
+    case UPDATE_ORDER_FAILURE:
+    case CANCEL_ORDER_FAILURE:
       return {
         ...state,
         error: payload,
         loading: false,
+        currentOrder: null,
+        paymentResponse: null
+      };
+    case CANCEL_ORDER_SUCCESS:
+      return {
+        ...state,
+        error: null,
+        loading: false,
+        orders: state.orders.map(order =>
+          order.id === payload.id ? { ...order, status: 'CANCELLED' } : order
+        ),
         currentOrder: null,
         paymentResponse: null
       };

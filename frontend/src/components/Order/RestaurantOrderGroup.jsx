@@ -1,11 +1,16 @@
-import React, { use, useEffect } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import CancelOrderModal from './CancelOrderModal';
+import { useDispatch } from 'react-redux';
+import { cancelOrder, getUsersOrders } from '../../State/Customer/Orders/Action';
 
 const formatPrice = n =>
   n.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
 const RestaurantOrderGroup = ({ order, items }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showCancelModal, setShowCancelModal] = useState(false);
   // Get restaurant info from first item
   const restaurant = items[0]?.food?.restaurant;
 
@@ -46,10 +51,18 @@ const RestaurantOrderGroup = ({ order, items }) => {
       minute: '2-digit'
     });
   };
-  useEffect(() => {
-    console.log("Restaurant Order Group: ", order);
-    console.log("Items: ", items);
-  }, []);
+
+  const handleCancelOrder = () => {
+    // TODO: trigger your API cancel logic
+    dispatch(cancelOrder(order.id, localStorage.getItem("token")));
+    console.log("Order cancelled:", order);
+    setShowCancelModal(false);
+  };
+
+  // useEffect(() => {
+  //   console.log("Restaurant Order Group: ", order);
+  //   console.log("Items: ", items);
+  // }, []);
 
   return (
     <div className="bg-[#1f1f1f] rounded border border-gray-700 overflow-hidden w-full">
@@ -80,9 +93,17 @@ const RestaurantOrderGroup = ({ order, items }) => {
             className="text-gray-400 text-xs border border-gray-500 px-2 py-1 rounded hover:bg-gray-600 hover:text-white">
             View Shop
           </button>
-          <span className={`text-xs font-semibold ${getStatusColor(order.orderStatus)}`}>
-            {getStatusText(order.orderStatus)}
-          </span>
+          <div className="flex flex-col items-end">
+            <span className={`text-xs font-semibold ${getStatusColor(order.orderStatus)}`}>
+              {getStatusText(order.orderStatus)}
+            </span>
+            {order.orderStatus === 'CANCELLED' && order.cancelledAt && (
+              <span className="text-red-400 text-[11px] italic mt-1">
+                Cancelled at: {formatOrderDate(order.cancelledAt)}
+              </span>
+            )}
+          </div>
+
         </div>
       </div>
 
@@ -171,7 +192,9 @@ const RestaurantOrderGroup = ({ order, items }) => {
                   Contact Seller
                 </button>
                 {order.cancellable && (
-                  <button className="border border-red-500 text-red-400 text-xs px-3 py-2 rounded hover:bg-red-600 hover:text-white">
+                  <button
+                    onClick={() => setShowCancelModal(true)}
+                    className="border border-red-500 text-red-400 text-xs px-3 py-2 rounded hover:bg-red-600 hover:text-white">
                     Cancel Order
                   </button>
                 )}
@@ -180,6 +203,12 @@ const RestaurantOrderGroup = ({ order, items }) => {
           </div>
         </div>
       </div>
+      <CancelOrderModal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelOrder}
+      />
+
     </div>
   )
 }
