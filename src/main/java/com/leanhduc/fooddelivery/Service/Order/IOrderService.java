@@ -12,13 +12,20 @@ public interface IOrderService {
 
     Order updateOrder(Long orderId, String orderStatus);
 
-    void cancelOrder(Long orderId);
+    Order cancelOrder(Long orderId);
+
+    boolean canCancelOrder(Long orderId);
 
     List<Order> getUsersOrder(Long userId);
 
     List<Order> getRestaurantsOrder(Long restaurantId, String orderStatus);
 
     Order getOrderById(Long orderId);
+
+    void deleteOrder(Long orderId);
+
+    List<OrderDto> searchOrders(Long id, Long minPrice, Long maxPrice,
+                                Long customerId, String status);
 
     List<OrderDto> conversionToListDto(List<Order> orders);
 

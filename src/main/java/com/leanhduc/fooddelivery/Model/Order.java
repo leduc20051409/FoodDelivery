@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "orders")
+@Table (name = "orders")
 public class Order {
 
     @Id
@@ -28,9 +28,14 @@ public class Order {
     @ManyToOne
     private Restaurant restaurant;
 
-    private Long totalAmount;
-    private String orderStatus;
+    @Enumerated (EnumType.STRING)
+    private OrderStatus orderStatus;
+
     private Date creatAt;
+
+    private Date updatedAt;
+
+    private Date cancelledAt;
 
     @ManyToOne
     private Address deliveryAddress;
@@ -40,5 +45,24 @@ public class Order {
 
     private int totalItem;
     private Long totalPrice;
+
+    @Enumerated (EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @Enumerated (EnumType.STRING)
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    private String paymentTransactionId;
+
+    private Date paymentDate;
+
+    private Boolean cancellable = true;
+
+    public boolean canBeCancelled() {
+        return cancellable &&
+                (orderStatus == OrderStatus.PENDING ||
+                        orderStatus == OrderStatus.CONFIRMED) &&
+                cancelledAt == null;
+    }
 }
 
