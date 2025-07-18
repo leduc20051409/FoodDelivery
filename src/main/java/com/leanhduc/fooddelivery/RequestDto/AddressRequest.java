@@ -12,4 +12,6 @@ public class AddressRequest {
     private String stateProvince;
     private String postalCode;
     private String country;
+    @NotBlank
+    private String phoneNumber;
 }

@@ -57,6 +57,7 @@ public class AddressService implements IAddressService{
         address.setStateProvince(addressRequest.getStateProvince());
         address.setPostalCode(addressRequest.getPostalCode());
         address.setCountry(addressRequest.getCountry());
+        address.setPhoneNumber(addressRequest.getPhoneNumber());
 
         Address updatedAddress = addressRepository.save(address);
         return updatedAddress;

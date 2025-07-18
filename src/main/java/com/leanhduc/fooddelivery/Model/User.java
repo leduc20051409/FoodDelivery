@@ -2,6 +2,7 @@ package com.leanhduc.fooddelivery.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leanhduc.fooddelivery.ResponseDto.RestaurantDto;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -55,5 +56,6 @@ public class User {
 
     private String status;
 
+    @Column(nullable = true)
     private String phoneNumber;
 }

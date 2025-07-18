@@ -1,5 +1,6 @@
 package com.leanhduc.fooddelivery.Service.Order;
 
+import com.leanhduc.fooddelivery.Exception.InvalidParamException;
 import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
 import com.leanhduc.fooddelivery.Model.*;
 import com.leanhduc.fooddelivery.Repository.AddressRepository;
@@ -33,22 +34,40 @@ public class OrderService implements IOrderService {
     @Override
     @Transactional
     public Order createOrder(OrderRequest orderRequest, User user) throws Exception {
+        Cart cart = cartService.findCartByUserId(user.getId());
+        Restaurant restaurant = restaurantService.getRestaurantById(orderRequest.getRestaurantId());
+        if (!restaurant.isOpen()) {
+            throw new InvalidParamException("Restaurant is currently closed");
+        }
+        if (cart.getItems().isEmpty()) {
+            throw new ResourceNotFoundException("Cart is empty, cannot create order");
+        }
+        for (CartItem cartItem : cart.getItems()) {
+            if (!cartItem.getFood().getRestaurant().getId().equals(orderRequest.getRestaurantId())) {
+                throw new InvalidParamException("All items in the cart must be from the same restaurant");
+            }
+        }
         Address shippingAddress = orderRequest.getDeliveryAddress();
         Address savedAddress = addressRepository.save(shippingAddress);
         if (!user.getAddresses().contains(savedAddress)) {
             user.getAddresses().add(savedAddress);
             userRepository.save(user);
         }
-        Restaurant restaurant = restaurantService.getRestaurantById(orderRequest.getRestaurantId());
-
         Order createdOrder = new Order();
         createdOrder.setRestaurant(restaurant);
         createdOrder.setCustomer(user);
         createdOrder.setDeliveryAddress(savedAddress);
         createdOrder.setCreatAt(new Date());
-        createdOrder.setOrderStatus("PENDING");
+        createdOrder.setOrderStatus(OrderStatus.PENDING);
 
-        Cart cart = cartService.findCartByUserId(user.getId());
+        createdOrder.setPaymentMethod(orderRequest.getPaymentMethod());
+        if (orderRequest.getPaymentMethod() == PaymentMethod.CASH_ON_DELIVERY) {
+            createdOrder.setPaymentStatus(PaymentStatus.PENDING);
+        } else {
+            createdOrder.setPaymentStatus(PaymentStatus.PROCESSING);
+            createdOrder.setPaymentTransactionId(orderRequest.getPaymentTransactionId());
+        }
+
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem cartItem : cart.getItems()) {
             OrderItem orderItem = new OrderItem();
@@ -63,31 +82,76 @@ public class OrderService implements IOrderService {
         Long totalPrice = cartService.calculateCartTotals(cart);
         createdOrder.setItems(orderItems);
         createdOrder.setTotalPrice(totalPrice);
+        createdOrder.setTotalItem(orderItems.size());
 
         Order savedOrder = orderRepository.save(createdOrder);
         restaurant.getOrders().add(savedOrder);
+
+        cart.getItems().clear();
         return savedOrder;
     }
 
     @Override
+    @Transactional
     public Order updateOrder(Long orderId, String orderStatus) {
         Order order = getOrderById(orderId);
-        if (orderStatus.equals("OUT_FOR_DELIVERY")
-                || orderStatus.equals("DELIVERED")
-                || orderStatus.equals("PENDING")
-                || orderStatus.equals("COMPLETED")) {
-            order.setOrderStatus(orderStatus);
-            orderRepository.save(order);
-            return order;
+        OrderStatus newStatus;
+        try {
+            newStatus = OrderStatus.valueOf(orderStatus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidParamException("Invalid order status: " + orderStatus);
         }
-        throw new ResourceNotFoundException("Order not found");
+        order.setOrderStatus(newStatus);
+        order.setUpdatedAt(new Date());
+        if (newStatus == OrderStatus.PREPARING ||
+                newStatus == OrderStatus.OUT_FOR_DELIVERY ||
+                newStatus == OrderStatus.DELIVERED ||
+                newStatus == OrderStatus.COMPLETED) {
+            order.setCancellable(false);
+        }
+        if (newStatus == OrderStatus.DELIVERED &&
+                order.getPaymentMethod() == PaymentMethod.CASH_ON_DELIVERY) {
+            order.setPaymentStatus(PaymentStatus.COMPLETED);
+            order.setPaymentDate(new Date());
+        }
+        return orderRepository.save(order);
     }
 
     @Override
-    public void cancelOrder(Long orderId) {
+    @Transactional
+    public Order cancelOrder(Long orderId) {
         Order order = getOrderById(orderId);
-        orderRepository.delete(order);
+        if (!order.canBeCancelled()) {
+            throw new InvalidParamException("Order cannot be cancelled at this stage");
+        }
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        order.setCancelledAt(new Date());
+        order.setUpdatedAt(new Date());
+        order.setCancellable(false);
 
+        if (order.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            order.setPaymentStatus(PaymentStatus.REFUNDED);
+            processRefund(order);
+        } else if (order.getPaymentStatus() == PaymentStatus.PROCESSING) {
+            order.setPaymentStatus(PaymentStatus.CANCELLED);
+        }
+
+        return orderRepository.save(order);
+
+    }
+
+    @Override
+    public boolean canCancelOrder(Long orderId) {
+        Order order = getOrderById(orderId);
+        return order.canBeCancelled();
+    }
+
+    private void processRefund(Order order) {
+        try {
+            System.out.println("Processing refund for order: " + order.getId());
+        } catch (Exception e) {
+            System.err.println("Refund failed for order: " + order.getId());
+        }
     }
 
     @Override
@@ -98,10 +162,18 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> getRestaurantsOrder(Long restaurantId, String orderStatus) {
         List<Order> orders = orderRepository.findByRestaurantId(restaurantId);
+        if (orders.isEmpty()) {
+            throw new ResourceNotFoundException("No orders found for this restaurant");
+        }
         if (orderStatus != null && !orderStatus.isEmpty()) {
-            orders = orders.stream()
-                    .filter(order -> order.getOrderStatus().equalsIgnoreCase(orderStatus))
-                    .toList();
+            try {
+                OrderStatus status = OrderStatus.valueOf(orderStatus.trim().toUpperCase());
+                orders = orders.stream()
+                        .filter(order -> order.getOrderStatus().equals(status))
+                        .toList();
+            } catch (IllegalArgumentException e) {
+                throw new InvalidParamException("Invalid order status: " + orderStatus);
+            }
         }
         return orders;
     }
@@ -110,6 +182,32 @@ public class OrderService implements IOrderService {
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+    }
+
+    @Override
+    public void deleteOrder(Long orderId) {
+        Order order = getOrderById(orderId);
+        if (order.getOrderStatus() != OrderStatus.CANCELLED) {
+            throw new InvalidParamException("Only cancelled orders can be deleted");
+        }
+        orderRepository.delete(order);
+    }
+
+    @Override
+    public List<OrderDto> searchOrders(Long id, Long minPrice, Long maxPrice,
+                                       Long customerId, String status) {
+        OrderStatus orderStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new InvalidParamException("Invalid order status: " + status);
+            }
+        }
+
+        List<Order> orders = orderRepository.searchOrders(id, minPrice, maxPrice,
+                customerId, orderStatus);
+        return conversionToListDto(orders);
     }
 
     @Override

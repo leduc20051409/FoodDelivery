@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Address {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -25,7 +25,7 @@ public class Address {
     private User user;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "deliveryAddress")
+    @OneToMany (cascade = CascadeType.ALL, mappedBy = "deliveryAddress")
     private List<Order> orders = new ArrayList<>();
 
     private String streetAddress;
@@ -33,4 +33,5 @@ public class Address {
     private String stateProvince;
     private String postalCode;
     private String country;
+    private String phoneNumber;
 }
