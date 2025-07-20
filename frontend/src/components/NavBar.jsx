@@ -19,8 +19,9 @@ const NavBar = () => {
             navigate("/admin/restaurant")
         }
     }
+    
     return (
-        <Box className="px-5 sticky z-50 py-[0.8rem] bg-[#e91e63] lg:px-20 flex justify-between">
+        <Box className="px-5 fixed top-0 left-0 right-0 z-50 py-[0.8rem] bg-[#e91e63] lg:px-20 flex justify-between">
             <div
                 onClick={() => navigate("/")}
                 className="lg:mr-10 cursor-pointer flex items-center gap-4"

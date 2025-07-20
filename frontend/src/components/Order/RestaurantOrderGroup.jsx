@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CancelOrderModal from './CancelOrderModal';
 import { useDispatch } from 'react-redux';
 import { cancelOrder, getUsersOrders } from '../../State/Customer/Orders/Action';
+import { addItemToCart } from '../../State/Customer/Cart/Action';
 
 const formatPrice = n =>
   n.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -11,6 +12,7 @@ const RestaurantOrderGroup = ({ order, items }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   // Get restaurant info from first item
   const restaurant = items[0]?.food?.restaurant;
 
@@ -53,16 +55,43 @@ const RestaurantOrderGroup = ({ order, items }) => {
   };
 
   const handleCancelOrder = () => {
-    // TODO: trigger your API cancel logic
     dispatch(cancelOrder(order.id, localStorage.getItem("token")));
     console.log("Order cancelled:", order);
     setShowCancelModal(false);
   };
 
-  // useEffect(() => {
-  //   console.log("Restaurant Order Group: ", order);
-  //   console.log("Items: ", items);
-  // }, []);
+  useEffect(() => {
+    console.log("Items: ", items);
+  }, []);
+
+  const handleBuyAgain = async (order) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login to add items to cart");
+      return;
+    }
+    setIsAddingToCart(true);
+    try {
+      for (const item of order.items) {
+        const reqData = {
+          token: token,
+          cartItem: {
+            foodId: item.food.id,
+            quantity: item.quantity,
+            ingredients: item.ingredients || []
+          }
+        };
+        await dispatch(addItemToCart(reqData));
+      }
+      console.log("All items added to cart successfully");
+      navigate('/cart');
+    } catch (error) {
+      console.error("Error adding items to cart:", error);
+      alert("Failed to add some items to cart. Please try again.");
+    } finally {
+      setIsAddingToCart(false);
+    }
+  }
 
   return (
     <div className="bg-[#1f1f1f] rounded border border-gray-700 overflow-hidden w-full">
@@ -164,7 +193,7 @@ const RestaurantOrderGroup = ({ order, items }) => {
           <div className="flex space-x-2">
             {order.orderStatus === "CANCELLED" ? (
               <>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-2 rounded">
+                <button onClick={() => handleBuyAgain(order)} className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-2 rounded cursor-pointer">
                   Buy Again
                 </button>
                 <button className="border border-gray-500 text-gray-400 text-xs px-3 py-2 rounded hover:bg-gray-600 hover:text-white">
@@ -176,7 +205,7 @@ const RestaurantOrderGroup = ({ order, items }) => {
               </>
             ) : order.orderStatus === "DELIVERED" || order.orderStatus === "COMPLETED" ? (
               <>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-2 rounded">
+                <button onClick={() => handleBuyAgain(order)} className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-2 rounded cursor-pointer">
                   Buy Again
                 </button>
                 <button className="border border-gray-500 text-gray-400 text-xs px-3 py-2 rounded hover:bg-gray-600 hover:text-white">
