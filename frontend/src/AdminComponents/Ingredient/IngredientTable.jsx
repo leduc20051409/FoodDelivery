@@ -46,19 +46,23 @@ const IngredientTable = () => {
                 />
                 <TableContainer component={Paper} >
                     <Table aria-label="simple table">
-                        <TableHead>
+                        <TableHead sx={{ backgroundColor: "#1e1e1e" }}>
                             <TableRow>
-                                <TableCell>Id</TableCell>
-                                <TableCell align="right">Name</TableCell>
-                                <TableCell align="right">Category</TableCell>
-                                <TableCell align="right">Avaibilty</TableCell>
+                                <TableCell sx={{ color: "#f0f0f0", fontWeight: "bold" }}>Id</TableCell>
+                                <TableCell sx={{ color: "#f0f0f0", fontWeight: "bold" }} align="right">Name</TableCell>
+                                <TableCell sx={{ color: "#f0f0f0", fontWeight: "bold" }} align="right">Category</TableCell>
+                                <TableCell sx={{ color: "#f0f0f0", fontWeight: "bold" }} align="right">Avaibilty</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {ingredient.ingredients.map((item) => (
                                 <TableRow
-                                    key={item.name}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    key={item.id}
+                                    sx={{
+                                        '&:last-child td, &:last-child th': { border: 0 },
+                                        '&:hover': { backgroundColor: '#2a2a2a' },
+                                        backgroundColor: item.id % 2 === 0 ? '#1c1c1c' : '#212121',
+                                    }}
                                 >
                                     <TableCell component="th" scope="row">{item.id}</TableCell>
                                     <TableCell align="right">{item.name}</TableCell>
