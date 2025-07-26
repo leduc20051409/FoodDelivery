@@ -40,7 +40,7 @@ public class Order {
     @ManyToOne
     private Address deliveryAddress;
 
-    @OneToMany
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
 
     private int totalItem;
