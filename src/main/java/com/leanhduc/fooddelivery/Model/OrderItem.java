@@ -1,16 +1,19 @@
 package com.leanhduc.fooddelivery.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString (exclude = {"food"})
 public class OrderItem {
 
     @Id
@@ -18,7 +21,9 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "food_id")
     private Food food;
+
     private int quantity;
     private Long totalPrice;
 

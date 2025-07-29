@@ -6,6 +6,7 @@ import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
 import com.leanhduc.fooddelivery.Exception.UnauthorizedAccessException;
 import com.leanhduc.fooddelivery.Response.AuthResponse;
 import com.leanhduc.fooddelivery.Response.BaseResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandle {
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -53,6 +55,12 @@ public class GlobalExceptionHandle {
     public ResponseEntity<AuthResponse> handleUnauthorized(UnauthorizedAccessException ex) {
         AuthResponse response = new AuthResponse(null, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<String> handleSecurityException(SecurityException ex) {
+        log.error("Security exception: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid webhook signature");
     }
 
     @ExceptionHandler(Exception.class)

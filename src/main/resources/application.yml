@@ -48,9 +48,15 @@ spring:
 support:
   email: penaldo2005vg@gmail.com
 
+app:
+  frontend:
+    url: ${FRONTEND_URL}
+
 jwt:
   secretKey: ${JWT_SECRET_KEY}
 
 stripe:
   api:
     key: ${STRIPE_API_KEY}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}

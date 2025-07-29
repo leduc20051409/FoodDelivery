@@ -4,6 +4,7 @@ import com.leanhduc.fooddelivery.Model.Order;
 import com.leanhduc.fooddelivery.Model.PaymentMethod;
 import com.leanhduc.fooddelivery.Model.User;
 import com.leanhduc.fooddelivery.RequestDto.OrderRequest;
+import com.leanhduc.fooddelivery.Response.MessageResponse;
 import com.leanhduc.fooddelivery.Response.PaymentResponse;
 import com.leanhduc.fooddelivery.ResponseDto.OrderDto;
 import com.leanhduc.fooddelivery.Service.Order.IOrderService;
@@ -24,25 +25,26 @@ public class OrderController {
     private final IUserService userService;
     private final IPaymentService paymentService;
 
-    @PostMapping ("/order")
+    @PostMapping("/order")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest,
-                                         @RequestHeader ("Authorization") String jwt) throws Exception {
+                                         @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findByJwtToken(jwt);
         Order order = orderService.createOrder(orderRequest, user);
-        PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
-        return switch (paymentMethod) {
-            case CASH_ON_DELIVERY -> {
-                OrderDto orderDto = orderService.conversionDto(order);
-                yield new ResponseEntity<>(orderDto, HttpStatus.CREATED);
-            }
-            case STRIPE_PAY, VN_PAY -> {
-                PaymentResponse response = paymentService.createPaymentLink(order);
-                yield new ResponseEntity<>(response, HttpStatus.CREATED);
-            }
-            default -> new ResponseEntity<>("Invalid payment method", HttpStatus.BAD_REQUEST);
-        };
-    }
 
+        if (orderRequest.getPaymentMethod() == PaymentMethod.CASH_ON_DELIVERY) {
+            OrderDto orderDto = orderService.conversionDto(order);
+            return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
+        } else {
+            try {
+                PaymentResponse response = paymentService.createPaymentLink(order);
+                return new ResponseEntity<>(response, HttpStatus.CREATED);
+            } catch (Exception e) {
+                orderService.handlePaymentFailure(order.getId());
+                return new ResponseEntity<>("Payment failed: " + e.getMessage(),
+                        HttpStatus.PAYMENT_REQUIRED);
+            }
+        }
+    }
     @GetMapping ("/order/user")
     public ResponseEntity<List<Order>> getOrderHistory(@RequestHeader ("Authorization") String jwt) {
         User user = userService.findByJwtToken(jwt);
@@ -67,5 +69,47 @@ public class OrderController {
         Order order = orderService.cancelOrder(orderId);
         OrderDto orderDto = orderService.conversionDto(order);
         return new ResponseEntity<>(orderDto, HttpStatus.OK);
+    }
+
+    @GetMapping ("/order/{orderId}")
+    public ResponseEntity<OrderDto> getOrderDetails(
+            @RequestHeader ("Authorization") String jwt,
+            @PathVariable Long orderId) {
+        User user = userService.findByJwtToken(jwt);
+        Order order = orderService.getOrderById(orderId);
+        if (!order.getCustomer().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        OrderDto orderDto = orderService.conversionDto(order);
+        return new ResponseEntity<>(orderDto, HttpStatus.OK);
+    }
+
+    @GetMapping ("/order/{orderId}/can-cancel")
+    public ResponseEntity<Boolean> canCancelOrder(
+            @RequestHeader ("Authorization") String jwt,
+            @PathVariable Long orderId) {
+        User user = userService.findByJwtToken(jwt);
+        Order order = orderService.getOrderById(orderId);
+        if (!order.getCustomer().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        boolean canCancel = orderService.canCancelOrder(orderId);
+        return new ResponseEntity<>(canCancel, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{orderId}")
+    public ResponseEntity<MessageResponse> deleteOrder(
+            @RequestHeader ("Authorization") String jwt,
+            @PathVariable Long orderId) {
+        User user = userService.findByJwtToken(jwt);
+        Order order = orderService.getOrderById(orderId);
+        if (!order.getCustomer().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        orderService.deleteOrder(orderId);
+        return new ResponseEntity<>(
+                new MessageResponse("Order deleted successfully"),
+                HttpStatus.OK
+        );
     }
 }

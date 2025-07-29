@@ -38,12 +38,28 @@ public class AdminOrderController {
         return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
-    @GetMapping("/restaurant/{restaurantId}")
+    @GetMapping ("/restaurant/{restaurantId}")
     public ResponseEntity<List<OrderDto>> getAllOrders(
             @PathVariable Long restaurantId,
-            @RequestParam (required = false) String orderStatus) {
+            @RequestParam (required = false) String orderStatus,
+            @RequestHeader ("Authorization") String jwt) {
+        userService.findByJwtToken(jwt);
         List<Order> orders = orderService.getRestaurantsOrder(restaurantId, orderStatus);
         List<OrderDto> orderDtos = orderService.conversionToListDto(orders);
         return new ResponseEntity<>(orderDtos, HttpStatus.OK);
+    }
+
+    @GetMapping ("/search")
+    public ResponseEntity<List<OrderDto>> searchOrders(
+            @RequestParam (required = false) Long id,
+            @RequestParam (required = false) Long minPrice,
+            @RequestParam (required = false) Long maxPrice,
+            @RequestParam (required = false) Long customerId,
+            @RequestParam (required = false) String status,
+            @RequestHeader ("Authorization") String jwt) {
+        userService.findByJwtToken(jwt);
+        List<OrderDto> orders = orderService.searchOrders(id, minPrice, maxPrice,
+                customerId, status);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }

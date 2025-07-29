@@ -1,5 +1,6 @@
 package com.leanhduc.fooddelivery.Service.Cart;
 
+import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
 import com.leanhduc.fooddelivery.Model.Cart;
 import com.leanhduc.fooddelivery.Model.CartItem;
 import com.leanhduc.fooddelivery.RequestDto.CartItemRequest;
@@ -17,7 +18,7 @@ public interface ICartService {
 
     Cart findCartById(Long id);
 
-    Cart findCartByUserId(Long userId) throws Exception;
+    Cart findCartByUserId(Long userId) throws ResourceNotFoundException;
 
     List<CartItem> findCartItemsByUserId(Long userId);
 

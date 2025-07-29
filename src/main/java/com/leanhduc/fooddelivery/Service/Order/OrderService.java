@@ -11,8 +11,13 @@ import com.leanhduc.fooddelivery.RequestDto.OrderRequest;
 import com.leanhduc.fooddelivery.ResponseDto.OrderDto;
 import com.leanhduc.fooddelivery.Service.Cart.ICartService;
 import com.leanhduc.fooddelivery.Service.Restaurant.IRestaurantService;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
+import com.stripe.param.RefundCreateParams;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,16 +29,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final AddressRepository addressRepository;
+    private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
     private final IRestaurantService restaurantService;
     private final ICartService cartService;
     private final ModelMapper modelMapper;
 
+    @Value ("${stripe.api.key}")
+    private String stripeSecretKey;
+
     @Override
     @Transactional
-    public Order createOrder(OrderRequest orderRequest, User user) throws Exception {
+    public Order createOrder(OrderRequest orderRequest, User user) {
         Cart cart = cartService.findCartByUserId(user.getId());
         Restaurant restaurant = restaurantService.getRestaurantById(orderRequest.getRestaurantId());
         if (!restaurant.isOpen()) {
@@ -65,7 +73,6 @@ public class OrderService implements IOrderService {
             createdOrder.setPaymentStatus(PaymentStatus.PENDING);
         } else {
             createdOrder.setPaymentStatus(PaymentStatus.PROCESSING);
-            createdOrder.setPaymentTransactionId(orderRequest.getPaymentTransactionId());
         }
 
         List<OrderItem> orderItems = new ArrayList<>();
@@ -90,6 +97,7 @@ public class OrderService implements IOrderService {
         cart.getItems().clear();
         return savedOrder;
     }
+
 
     @Override
     @Transactional
@@ -146,11 +154,66 @@ public class OrderService implements IOrderService {
         return order.canBeCancelled();
     }
 
+    @Override
+    @Transactional
+    public void handlePaymentSuccess(Long orderId) {
+        Order order = getOrderById(orderId);
+        if (order.getPaymentStatus() == PaymentStatus.PROCESSING) {
+            order.setPaymentStatus(PaymentStatus.COMPLETED);
+            order.setPaymentDate(new Date());
+            order.setOrderStatus(OrderStatus.CONFIRMED);
+            order.setUpdatedAt(new Date());
+            orderRepository.save(order);
+
+//            try {
+//                cartService.findCartByUserId(order.getCustomer().getId()).getItems().clear();
+//            } catch (ResourceNotFoundException e) {
+//                throw new ResourceNotFoundException("Cart not found for user: " + order.getCustomer().getId());
+//            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void handlePaymentFailure(Long orderId) {
+        Order order = getOrderById(orderId);
+        if (order.getPaymentStatus() == PaymentStatus.PROCESSING) {
+            order.setOrderStatus(OrderStatus.CANCELLED);
+            order.setPaymentStatus(PaymentStatus.FAILED);
+            order.setCancelledAt(new Date());
+            order.setUpdatedAt(new Date());
+            order.setCancellable(false);
+            orderRepository.save(order);
+        }
+    }
+
     private void processRefund(Order order) {
+        if (order.getPaymentTransactionId() == null) {
+            return;
+        }
         try {
-            System.out.println("Processing refund for order: " + order.getId());
+            Stripe.apiKey = stripeSecretKey;
+
+            RefundCreateParams params = RefundCreateParams.builder()
+                    .setPaymentIntent(order.getPaymentTransactionId())
+                    .setAmount(order.getTotalPrice() * 100)
+                    .setReason(RefundCreateParams.Reason.REQUESTED_BY_CUSTOMER)
+                    .putMetadata("order_id", order.getId().toString())
+                    .putMetadata("customer_id", order.getCustomer().getId().toString())
+                    .build();
+
+            Refund refund = Refund.create(params);
+
+            if ("succeeded".equals(refund.getStatus())) {
+                order.setPaymentStatus(PaymentStatus.REFUNDED);
+                order.setPaymentDate(new Date());
+            } else {
+                throw new InvalidParamException("Refund failed: " + refund.getFailureReason());
+            }
+        } catch (StripeException e) {
+            throw new RuntimeException("Refund processing failed: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Refund failed for order: " + order.getId());
+            throw new RuntimeException("Refund processing failed");
         }
     }
 
@@ -208,6 +271,12 @@ public class OrderService implements IOrderService {
         List<Order> orders = orderRepository.searchOrders(id, minPrice, maxPrice,
                 customerId, orderStatus);
         return conversionToListDto(orders);
+    }
+
+    @Override
+    public Order getOrderByPaymentTransactionId(String paymentTransactionId) {
+        return orderRepository.getOrderByPaymentTransactionId(paymentTransactionId)
+                .orElseThrow(null);
     }
 
     @Override
