@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import CartItem from '../components/CartItem'
-import { Box, Button, Card, Divider, FormControl, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Card, Divider, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Snackbar, TextField, Typography } from '@mui/material'
 import AddressCart from '../components/AddressCart';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
@@ -26,6 +26,22 @@ export const style = {
 
 const Cart = () => {
   const demo = [1, 1, 1, 1];
+  const [open, setOpen] = useState(false);
+  const jwt = localStorage.getItem("token");
+  const { auth, cart, addresses } = useSelector(store => store);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [snack, setSnack] = useState({ open: false, message: '', severity: 'error' });
+
+  const showMessage = (message, severity = 'error') => {
+    setSnack({ open: true, message, severity })
+  }
+
+  const handleSnackClose = (event, reason) => {
+    if (reason === 'clickaway') return
+    setSnack((prev) => ({ ...prev, open: false }))
+  }
+
   const intitalValue = {
     streetAddress: '',
     state: '',
@@ -41,11 +57,6 @@ const Cart = () => {
     city: Yup.string().required('Required'),
   });
 
-  const [open, setOpen] = useState(false);
-  const jwt = localStorage.getItem("token");
-  const { auth, cart, addresses } = useSelector(store => store);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleClose = () => setOpen(false);
   const handleOpenAddAddressModal = () => {
@@ -53,7 +64,7 @@ const Cart = () => {
   };
   const createOrderUsingAddress = (address) => {
     if (!isSameRestaurant(cart.cartItems)) {
-      alert('Your cart contains items from different restaurants.');
+      showMessage('All items in the cart must be from the same restaurant to proceed with the order.', 'error');
       return;
     } else {
       dispatch({ type: 'SET_SELECTED_ADDRESS', payload: address });
@@ -311,6 +322,20 @@ const Cart = () => {
           </Formik>
         </Box>
       </Modal >
+      <Snackbar
+        open={snack.open}
+        autoHideDuration={4000}
+        onClose={handleSnackClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleSnackClose}
+          severity={snack.severity}
+          sx={{ width: '100%' }}
+        >
+          {snack.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

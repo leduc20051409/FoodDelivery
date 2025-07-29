@@ -7,21 +7,24 @@ import {
   GET_RESTAURANTS_ORDER_REQUEST,
   GET_RESTAURANTS_ORDER_SUCCESS,
   GET_RESTAURANTS_ORDER_FAILURE,
+  SEARCH_ORDERS_REQUEST,
+  SEARCH_ORDERS_SUCCESS,
+  SEARCH_ORDERS_FAILURE,
 } from "./ActionType.js";
 import { api } from "../../../components/config/Api.js";
 
 
-export const updateOrderStatus = ({orderId,orderStatus,jwt}) => {
+export const updateOrderStatus = ({ orderId, orderStatus, jwt }) => {
   return async (dispatch) => {
     try {
       dispatch({ type: UPDATE_ORDER_STATUS_REQUEST });
 
       const response = await api.put(
-        `/api/admin/orders/order/${orderId}/${orderStatus}`,{},{
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
+        `/api/admin/orders/order/${orderId}/${orderStatus}`, {}, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
       );
 
       const updatedOrder = response.data;
@@ -39,18 +42,18 @@ export const updateOrderStatus = ({orderId,orderStatus,jwt}) => {
   };
 };
 
-export const fetchRestaurantsOrder = ({restaurantId,orderStatus,jwt}) => {
+export const fetchRestaurantsOrder = ({ restaurantId, orderStatus, jwt }) => {
   return async (dispatch) => {
     try {
       dispatch({ type: GET_RESTAURANTS_ORDER_REQUEST });
 
       const { data } = await api.get(
-        `/api/admin/orders/restaurant/${restaurantId}`,{
-          params: { order_status:orderStatus},
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
+        `/api/admin/orders/restaurant/${restaurantId}`, {
+        params: { orderStatus: orderStatus },
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
       );
 
       const orders = data;
@@ -64,3 +67,28 @@ export const fetchRestaurantsOrder = ({restaurantId,orderStatus,jwt}) => {
     }
   };
 };
+
+export const searchOrders = ({ search, jwt }) => {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: SEARCH_ORDERS_REQUEST });
+
+      const { data } = await api.get(
+        `/api/admin/orders/search`, {
+        params: { search: search },
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
+      );
+      const orders = data;
+      console.log("searched orders ------ ", orders);
+      dispatch({
+        type: SEARCH_ORDERS_SUCCESS,
+        payload: orders,
+      });
+    } catch (error) {
+      dispatch({ type: SEARCH_ORDERS_FAILURE, error });
+    }
+  };
+}

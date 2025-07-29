@@ -83,7 +83,7 @@ const Orders = () => {
       <h1 className="text-xl font-semibold py-6">My Orders</h1>
 
       {/* Tabs */}
-      <div className="sticky top-0 z-10 bg-[#121212]">
+      <div className="sticky top-20 z-10 bg-[#121212]">
         <div className="flex justify-center">
           <div className="flex space-x-8 border-b border-gray-700 mb-6 px-4 py-3 overflow-x-auto">
             {TABS.map(tab => {

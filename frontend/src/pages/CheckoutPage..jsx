@@ -10,6 +10,7 @@ import Title from '../components/Title'
 const CheckoutPage = () => {
   const { auth, cart, order } = useSelector(store => store);
   const [method, setMethod] = useState("CASH_ON_DELIVERY");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -18,7 +19,7 @@ const CheckoutPage = () => {
     console.log("cart", cart);
   }, [auth]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (order.currentOrder && method === 'CASH_ON_DELIVERY') {
       // Navigate to success page for COD orders
       navigate('/my-profile/orders', { state: { order: order.currentOrder } });
@@ -26,28 +27,56 @@ const CheckoutPage = () => {
   }, [order.currentOrder, method, navigate]);
 
   const placeOrder = () => {
-    const orderData = {
-      restaurantId: cart.cartItems[0].food.restaurant.id,
-      deliveryAddress: {
-        fullName: auth.user?.fullName,
-        streetAddress: auth.selectedAddress?.streetAddress,
-        city: auth.selectedAddress?.city,
-        stateProvince: auth.selectedAddress?.stateProvince,
-        postalCode: auth.selectedAddress?.postalCode,
-        country: auth.selectedAddress?.country,
-        phoneNumber: auth.selectedAddress?.phoneNumber,
-      },
-      paymentMethod: method,
-      paymentTransactionId: null,
-    };
+    setLoading(true);
+    try {
+      const orderData = {
+        restaurantId: cart.cartItems[0].food.restaurant.id,
+        deliveryAddress: {
+          fullName: auth.user?.fullName,
+          streetAddress: auth.selectedAddress?.streetAddress,
+          city: auth.selectedAddress?.city,
+          stateProvince: auth.selectedAddress?.stateProvince,
+          postalCode: auth.selectedAddress?.postalCode,
+          country: auth.selectedAddress?.country,
+          phoneNumber: auth.selectedAddress?.phoneNumber,
+        },
+        paymentMethod: method,
+        paymentTransactionId: null,
+      };
 
-    const reqData = {
-      order: orderData,
-      token: localStorage.getItem("token"),
-      navigate: navigate 
-    };
-    dispatch(createOrder(reqData));
-    console.log("Order Data: ", orderData);
+      const reqData = {
+        order: orderData,
+        token: localStorage.getItem("token"),
+        navigate: navigate
+      };
+      dispatch(createOrder(reqData));
+      console.log("Order Data: ", orderData);
+    } catch (error) {
+      console.error("Order placement error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (order.loading || loading) {
+    return (
+      <Box className='container mx-auto px-4 py-8 text-center'>
+        <Typography variant="h6">Processing your order...</Typography>
+      </Box>
+    );
+  }
+
+  if (order.error) {
+    return (
+      <Box className='container mx-auto px-4 py-8 text-center'>
+        <Typography variant="h6" color="error">
+          Error: {order.error.message || 'Something went wrong'}
+        </Typography>
+        <Button onClick={() => window.location.reload()} sx={{ mt: 2 }}>
+          Try Again
+        </Button>
+      </Box>
+    );
   }
 
   return (
@@ -208,6 +237,7 @@ const CheckoutPage = () => {
             fullWidth
             size="large"
             onClick={placeOrder}
+            disabled={loading || order.loading}
             sx={{
               mt: 4,
               py: 1.5,
@@ -217,7 +247,7 @@ const CheckoutPage = () => {
               }
             }}
           >
-            Place Order
+            {loading || order.loading ? 'Processing...' : 'Place Order'}
           </Button>
         </Paper>
       </div>
