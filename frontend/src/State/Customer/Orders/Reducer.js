@@ -3,6 +3,7 @@ import {
   CANCEL_ORDER_FAILURE,
   CANCEL_ORDER_REQUEST,
   CANCEL_ORDER_SUCCESS,
+  CLEAR_ORDER_STATE,
   CREATE_ORDER_FAILURE,
   CREATE_ORDER_REQUEST,
   CREATE_ORDER_SUCCESS,
@@ -12,6 +13,9 @@ import {
   GET_USERS_ORDERS_SUCCESS,
   UPDATE_ORDER_FAILURE,
   UPDATE_ORDER_REQUEST,
+  VERIFY_PAYMENT_FAILURE,
+  VERIFY_PAYMENT_REQUEST,
+  VERIFY_PAYMENT_SUCCESS,
 } from "./ActionType";
 
 const initialState = {
@@ -21,6 +25,11 @@ const initialState = {
   notifications: [],
   currentOrder: null,
   paymentResponse: null,
+  paymentVerification: {
+    loading: false,
+    verified: false,
+    error: null,
+  },
 };
 export const orderReducer = (state = initialState, { type, payload }) => {
   switch (type) {
@@ -35,6 +44,16 @@ export const orderReducer = (state = initialState, { type, payload }) => {
         paymentResponse: null
       };
 
+    case VERIFY_PAYMENT_REQUEST:
+      return {
+        ...state,
+        paymentVerification: {
+          ...state.paymentVerification,
+          loading: true,
+          error: null
+        }
+      };
+
     case CREATE_ORDER_SUCCESS: {
       const isPaymentResponse = payload.payment_url || payload.payment_link_url || payload.paymentUrl;
       return {
@@ -45,16 +64,7 @@ export const orderReducer = (state = initialState, { type, payload }) => {
         paymentResponse: isPaymentResponse ? payload : null
       };
     }
-    case CREATE_ORDER_FAILURE:
-    case UPDATE_ORDER_FAILURE:
-    case CANCEL_ORDER_FAILURE:
-      return {
-        ...state,
-        error: payload,
-        loading: false,
-        currentOrder: null,
-        paymentResponse: null
-      };
+
     case CANCEL_ORDER_SUCCESS:
       return {
         ...state,
@@ -66,6 +76,36 @@ export const orderReducer = (state = initialState, { type, payload }) => {
         currentOrder: null,
         paymentResponse: null
       };
+
+    case VERIFY_PAYMENT_SUCCESS:
+      return {
+        ...state,
+        paymentVerification: {
+          loading: false,
+          verified: true,
+          error: null
+        },
+        currentOrder: payload.order || null
+      };
+    case CREATE_ORDER_FAILURE:
+    case UPDATE_ORDER_FAILURE:
+    case CANCEL_ORDER_FAILURE:
+      return {
+        ...state,
+        error: payload,
+        loading: false,
+        currentOrder: null,
+        paymentResponse: null
+      };
+    case VERIFY_PAYMENT_FAILURE:
+      return {
+        ...state,
+        paymentVerification: {
+          loading: false,
+          verified: false,
+          error: payload
+        }
+      };
     case GET_USERS_ORDERS_REQUEST:
       return { ...state, error: null, loading: true };
     case GET_USERS_ORDERS_SUCCESS:
@@ -76,6 +116,18 @@ export const orderReducer = (state = initialState, { type, payload }) => {
     case GET_USERS_ORDERS_FAILURE:
       return { ...state, error: payload, loading: false };
 
+    case CLEAR_ORDER_STATE:
+      return {
+        ...state,
+        currentOrder: null,
+        paymentResponse: null,
+        error: null,
+        paymentVerification: {
+          loading: false,
+          verified: false,
+          error: null
+        }
+      };
 
     default:
       return state;

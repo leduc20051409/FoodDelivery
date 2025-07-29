@@ -15,6 +15,7 @@ const RestaurantOrderGroup = ({ order, items }) => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   // Get restaurant info from first item
   const restaurant = items[0]?.food?.restaurant;
+  const jwt = localStorage.getItem("token");
 
   // Map order status to display text
   const getStatusText = (status) => {
@@ -54,8 +55,9 @@ const RestaurantOrderGroup = ({ order, items }) => {
     });
   };
 
-  const handleCancelOrder = () => {
-    dispatch(cancelOrder(order.id, localStorage.getItem("token")));
+  const handleCancelOrder = async () => {
+    await dispatch(cancelOrder(order.id, jwt));
+    await dispatch(getUsersOrders(jwt));
     console.log("Order cancelled:", order);
     setShowCancelModal(false);
   };

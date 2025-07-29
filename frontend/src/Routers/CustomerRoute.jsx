@@ -6,7 +6,7 @@ import Cart from '../pages/Cart'
 import Profile from '../pages/Profile'
 import NavBar from '../components/NavBar'
 import RestaurentDetail from '../pages/RestaurentDetail'
-import PaymentSuccess from '../components/PaymentSuccess/PaymentSuccess'
+import PaymentSuccess from '../components/Payment/PaymentSuccess'
 import Search from '../components/Search/Search'
 
 import ResetPasswordForm from '../components/auth/ResetPasswordForm'
@@ -14,6 +14,7 @@ import EmptyLayout from '../layout/EmptyLayout'
 import MainLayout from '../layout/MainLayout'
 import GoogleCallback from '../components/auth/GoogleCallback'
 import CheckoutPage from '../pages/CheckoutPage.'
+import PaymentCancel from '../components/Payment/PaymentCancel'
 
 const CustomerRoute = () => {
     return (
@@ -33,7 +34,8 @@ const CustomerRoute = () => {
                     <Route path='/cart/checkout' element={<CheckoutPage />} />
                     <Route path="/my-profile/*" element={<Profile />} />
                     <Route path='/search' element={<Search />} />
-                    <Route path="/payment/success/:id" element={<PaymentSuccess />} />
+                    <Route path="/payment/success/:sessionId" element={<PaymentSuccess />} />
+                    <Route path="/payment/cancel/:sessionId" element={<PaymentCancel />} />
                 </Route>
             </Routes>
         </div>

@@ -1,5 +1,6 @@
 
 import { api } from "../../../components/config/Api";
+import { PaymentService } from "../../../services/PaymentService";
 import { CANCEL_ORDER_FAILURE, CANCEL_ORDER_REQUEST, CANCEL_ORDER_SUCCESS, CREATE_ORDER_FAILURE, CREATE_ORDER_REQUEST, CREATE_ORDER_SUCCESS, GET_USERS_NOTIFICATION_REQUEST, GET_USERS_ORDERS_FAILURE, GET_USERS_ORDERS_REQUEST, GET_USERS_ORDERS_SUCCESS } from "./ActionType";
 import { GET_USERS_NOTIFICATION_FAILURE, GET_USERS_NOTIFICATION_SUCCESS } from "./ActionType";
 
@@ -20,11 +21,10 @@ export const createOrder = (reqData) => {
                     reqData.navigate('/my-profile/orders', { state: { order: data } });
                 }
             } else {
-                dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
                 const paymentUrl = data.payment_url || data.payment_link_url || data.paymentUrl;
 
                 if (paymentUrl) {
-                    window.location.href = paymentUrl;
+                    PaymentService.redirectToPayment(paymentUrl);
                 } else {
                     console.error('Payment URL not found in response');
                     throw new Error('Payment URL not found in response');
