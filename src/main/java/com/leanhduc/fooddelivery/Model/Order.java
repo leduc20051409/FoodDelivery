@@ -2,18 +2,20 @@ package com.leanhduc.fooddelivery.Model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"customer", "restaurant", "items", "deliveryAddress"})
 @Table (name = "orders")
 public class Order {
 
@@ -40,7 +42,7 @@ public class Order {
     @ManyToOne
     private Address deliveryAddress;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
     private List<OrderItem> items;
 
     private int totalItem;

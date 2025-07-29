@@ -87,7 +87,7 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public Cart findCartByUserId(Long userId) throws Exception {
+    public Cart findCartByUserId(Long userId) throws ResourceNotFoundException {
         Cart cart = cartRepository.findByCustomerId(userId);
         cart.setTotal(calculateCartTotals(cart));
         return cart;
