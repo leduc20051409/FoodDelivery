@@ -32,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +51,7 @@ public class UserService implements IUserService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public AuthResponse createUser(RegisterRequest user) throws Exception {
         Optional<User> isEmailExist = userRepository.findByEmail(user.getEmail());
         if (isEmailExist.isPresent()) {

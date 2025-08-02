@@ -59,4 +59,8 @@ public class User {
 
     @Column(nullable = true)
     private String phoneNumber;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Review> reviews = new ArrayList<>();
 }
