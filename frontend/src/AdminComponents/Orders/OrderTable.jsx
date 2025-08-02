@@ -17,14 +17,34 @@ const OrderTable = ({ status, search }) => {
   const dispatch = useDispatch();
   const jwt = localStorage.getItem("token");
   const { restaurant, restaurantOrder, ingredient, menu } = useSelector(store => store);
-  const orders = [1, 1, 1, 1, 1];
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  
+  // Thay đổi: sử dụng object để lưu trữ anchorEl cho từng order
+  const [anchorEls, setAnchorEls] = useState({});
+  
+  // Thay đổi: thêm state để track order hiện tại đang được update
+  const [currentOrderId, setCurrentOrderId] = useState(null);
+
+  // Thay đổi: hàm để check xem menu của order nào đang mở
+  const isMenuOpen = (orderId) => Boolean(anchorEls[orderId]);
+
+  // Thay đổi: hàm xử lý click cho từng order riêng biệt
+  const handleClick = (event, orderId) => {
+    setAnchorEls(prev => ({
+      ...prev,
+      [orderId]: event.currentTarget
+    }));
+    setCurrentOrderId(orderId);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
+
+  // Thay đổi: hàm đóng menu cho từng order riêng biệt
+  const handleClose = (orderId) => {
+    setAnchorEls(prev => ({
+      ...prev,
+      [orderId]: null
+    }));
+    if (currentOrderId === orderId) {
+      setCurrentOrderId(null);
+    }
   };
 
   useEffect(() => {
@@ -65,16 +85,16 @@ const OrderTable = ({ status, search }) => {
 
   useEffect(() => {
     console.log("orders", restaurantOrder.orders);
-
   }, []);
 
-  const handleUpdateOrderStatus = (orderId, status) => {
+  // Thay đổi: hàm update sử dụng currentOrderId thay vì item.id trong closure
+  const handleUpdateOrderStatus = (orderId, statusValue) => {
     dispatch(updateOrderStatus({
       orderId: orderId,
-      orderStatus: status,
+      orderStatus: statusValue,
       jwt: jwt,
     }));
-    handleClose();
+    handleClose(orderId);
   }
 
   return (
@@ -114,13 +134,17 @@ const OrderTable = ({ status, search }) => {
                   </TableCell>
                   <TableCell align="right">
                     <AvatarGroup>
-                      {item.items.map((orderItem) => <Avatar src={orderItem.food?.images[0]} />)}
+                      {item.items.map((orderItem, index) => 
+                        <Avatar key={index} src={orderItem.food?.images[0]} />
+                      )}
                     </AvatarGroup>
                   </TableCell>
                   <TableCell align="right">{item.customer.fullName}</TableCell>
                   <TableCell align="right">{item.totalPrice}</TableCell>
                   <TableCell align="right">
-                    {item.items.map((orderItem) => <p>{orderItem.food?.name}</p>)}
+                    {item.items.map((orderItem, index) => 
+                      <p key={index}>{orderItem.food?.name}</p>
+                    )}
                   </TableCell>
                   <TableCell align="right">
                     {item.items?.map((orderItem, orderIndex) => (
@@ -148,11 +172,11 @@ const OrderTable = ({ status, search }) => {
                   </TableCell>
                   <TableCell align="right">
                     <Button
-                      id="basic-button"
-                      aria-controls={open ? 'basic-menu' : undefined}
+                      id={`basic-button-${item.id}`}
+                      aria-controls={isMenuOpen(item.id) ? `basic-menu-${item.id}` : undefined}
                       aria-haspopup="true"
-                      aria-expanded={open ? 'true' : undefined}
-                      onClick={handleClick}
+                      aria-expanded={isMenuOpen(item.id) ? 'true' : undefined}
+                      onClick={(event) => handleClick(event, item.id)}
                       sx={{
                         color: '#f50057',
                         fontWeight: 'bold'
@@ -161,18 +185,22 @@ const OrderTable = ({ status, search }) => {
                       Update
                     </Button>
                     <Menu
-                      id="basic-menu"
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
+                      id={`basic-menu-${item.id}`}
+                      anchorEl={anchorEls[item.id]}
+                      open={isMenuOpen(item.id)}
+                      onClose={() => handleClose(item.id)}
                       MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                        'aria-labelledby': `basic-button-${item.id}`,
                       }}
                     >
-                      {orderStatus.map((status) => <MenuItem
-                        onClick={() => handleUpdateOrderStatus(item.id, status.value)}>
-                        {status.label}
-                      </MenuItem>)}
+                      {orderStatus.map((status) => (
+                        <MenuItem
+                          key={status.value}
+                          onClick={() => handleUpdateOrderStatus(item.id, status.value)}
+                        >
+                          {status.label}
+                        </MenuItem>
+                      ))}
                     </Menu>
                   </TableCell>
                 </TableRow>
@@ -182,7 +210,6 @@ const OrderTable = ({ status, search }) => {
         </TableContainer>
       </Card>
     </Box>
-
   )
 }
 

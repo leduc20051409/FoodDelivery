@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToFavourite } from '../State/Customer/Authentication/Action';
 import { isPresentInFavourites } from './config/Logic';
+import StarIcon from '@mui/icons-material/Star';
 
 const RestaurantCard = ({ item }) => {
     const navigate = useNavigate();
@@ -13,8 +14,8 @@ const RestaurantCard = ({ item }) => {
     const jwt = localStorage.getItem("token");
     const { auth } = useSelector(store => store);
     const address = item.address
-      ? `${item.address.streetAddress}, ${item.address.city}, ${item.address.stateProvince}, ${item.address.country}`
-      : item.title;
+        ? `${item.address.streetAddress}, ${item.address.city}, ${item.address.stateProvince}, ${item.address.country}`
+        : item.title;
 
     const hadleAddToFavorite = () => {
         dispatch(addToFavourite({ restaurantId: item.id, jwt }));
@@ -44,12 +45,21 @@ const RestaurantCard = ({ item }) => {
                     <p
                         onClick={handleNavigateToRestaurant}
                         className={`font-semibold text-lg ${item.open
-                                ? "cursor-pointer"
-                                : "cursor-not-allowed text-gray-500"
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed text-gray-500"
                             }`}
                     >
                         {item.name}
                     </p>
+                    {item.averageRating > 0 && (
+                        <div className="flex items-center gap-1 text-yellow-500 text-sm">
+                            <StarIcon fontSize="small" />
+                            <span>{item.averageRating.toFixed(1)}</span>
+                            <span className="text-gray-400 ml-1">
+                                ({item.totalReviews} reviews)
+                            </span>
+                        </div>
+                    )}
                     {address && (
                         <p className="text-gray-500 text-sm">
                             {address}

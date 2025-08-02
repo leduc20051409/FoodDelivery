@@ -1,9 +1,11 @@
-import React, { use, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import CancelOrderModal from './CancelOrderModal';
+import ReviewModal from '../ReviewModal';
 import { useDispatch } from 'react-redux';
 import { cancelOrder, getUsersOrders } from '../../State/Customer/Orders/Action';
 import { addItemToCart } from '../../State/Customer/Cart/Action';
+import { createReview, getReviewByOrderId, updateReview } from '../../State/Customer/Reviews/Action';
 
 const formatPrice = n =>
   n.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -12,7 +14,10 @@ const RestaurantOrderGroup = ({ order, items }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [existingReview, setExistingReview] = useState(null);
+  const [isLoadingReview, setIsLoadingReview] = useState(false);
   // Get restaurant info from first item
   const restaurant = items[0]?.food?.restaurant;
   const jwt = localStorage.getItem("token");
@@ -60,6 +65,53 @@ const RestaurantOrderGroup = ({ order, items }) => {
     await dispatch(getUsersOrders(jwt));
     console.log("Order cancelled:", order);
     setShowCancelModal(false);
+  };
+
+  const handleReviewSubmit = async (reviewData) => {
+    try {
+      const payload = {
+        rating: reviewData.rating,
+        comment: reviewData.comment
+      };
+
+      console.log('Data to send to API:', payload);
+      if (reviewData.isEditing && existingReview) {
+        await dispatch(updateReview(existingReview.id, {
+          rating: reviewData.rating,
+          comment: reviewData.comment
+        }, jwt));
+      } else {
+        await dispatch(createReview(order.id, {
+          rating: reviewData.rating,
+          comment: reviewData.comment
+        }, jwt));
+      }
+      await checkExistingReview();
+      setShowReviewModal(false);
+      //alert(`Review ${reviewData.isEditing ? 'updated' : 'submitted'} successfully!`);
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Failed to submit review. Please try again.');
+      throw error;
+    }
+  };
+
+  const checkExistingReview = async () => {
+    setIsLoadingReview(true);
+    try {
+      const reviewData = await dispatch(getReviewByOrderId(order.id, jwt));
+      setExistingReview(reviewData);
+    } catch (error) {
+      console.error('Error checking existing review:', error);
+      setExistingReview(null);
+    } finally {
+      setIsLoadingReview(false);
+    }
+  };
+
+  const handleOpenReviewModal = () => {
+    checkExistingReview();
+    setShowReviewModal(true);
   };
 
   useEffect(() => {
@@ -155,7 +207,7 @@ const RestaurantOrderGroup = ({ order, items }) => {
                 <p className="text-gray-400 text-xs mt-1">
                   Category: {item.food?.category?.name || 'N/A'}
                 </p>
-                {item.ingredients && item.ingredients.length > 0 && (
+                {item.ingredients && item.ingredients.length > 3 && (
                   <p className="text-gray-400 text-xs">
                     Ingredients: {item.ingredients.slice(0, 3).map(ing => ing.name).join(', ')}
                     {item.ingredients.length > 3 && '...'}
@@ -210,8 +262,11 @@ const RestaurantOrderGroup = ({ order, items }) => {
                 <button onClick={() => handleBuyAgain(order)} className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-2 rounded cursor-pointer">
                   Buy Again
                 </button>
-                <button className="border border-gray-500 text-gray-400 text-xs px-3 py-2 rounded hover:bg-gray-600 hover:text-white">
-                  Rate & Review
+                <button
+                  onClick={handleOpenReviewModal}
+                  disabled={isLoadingReview}
+                  className="border border-gray-500 text-gray-400 text-xs px-3 py-2 rounded hover:bg-gray-600 hover:text-white disabled:opacity-50">
+                  {isLoadingReview ? 'Loading...' : (existingReview ? 'Edit Review' : 'Rate & Review')}
                 </button>
                 <button className="border border-gray-500 text-gray-400 text-xs px-3 py-2 rounded hover:bg-gray-600 hover:text-white">
                   Contact Seller
@@ -234,10 +289,21 @@ const RestaurantOrderGroup = ({ order, items }) => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
       <CancelOrderModal
         open={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         onConfirm={handleCancelOrder}
+      />
+
+      <ReviewModal
+        open={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        order={order}
+        restaurant={restaurant}
+        onSubmit={handleReviewSubmit}
+        existingReview={existingReview}
       />
 
     </div>
