@@ -49,4 +49,11 @@ public class Restaurant {
     @JsonIgnore
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<Food> foods = new ArrayList<>();
+
+    private Double averageRating = 0.0;
+    private Integer totalReviews = 0;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private List<Review> reviews = new ArrayList<>();
 }

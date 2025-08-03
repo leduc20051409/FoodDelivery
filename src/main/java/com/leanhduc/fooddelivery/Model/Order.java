@@ -2,7 +2,6 @@ package com.leanhduc.fooddelivery.Model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -58,7 +57,13 @@ public class Order {
 
     private Date paymentDate;
 
-    private Boolean cancellable = true;
+    private boolean cancellable = true;
+
+    @Column(nullable = false)
+    private boolean reviewable = false;
+
+    @Column(nullable = false)
+    private boolean reviewed = false;
 
     public boolean canBeCancelled() {
         return cancellable &&
