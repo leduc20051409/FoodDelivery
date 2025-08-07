@@ -1,9 +1,6 @@
 package com.leanhduc.fooddelivery.Controller;
 
-import com.leanhduc.fooddelivery.RequestDto.GoogleAuthRequest;
-import com.leanhduc.fooddelivery.RequestDto.GoogleCallbackRequest;
-import com.leanhduc.fooddelivery.RequestDto.LoginRequest;
-import com.leanhduc.fooddelivery.RequestDto.RegisterRequest;
+import com.leanhduc.fooddelivery.RequestDto.*;
 import com.leanhduc.fooddelivery.Response.AuthResponse;
 import com.leanhduc.fooddelivery.Response.MessageResponse;
 import com.leanhduc.fooddelivery.Response.ResetPasswordResponse;
@@ -13,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -76,4 +74,31 @@ public class AuthController {
         AuthResponse response = authService.authenticateWithGoogle(request.getCode(), request.getRedirectUri());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        AuthResponse response = authService.refreshAccessToken(request.getRefreshToken());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<MessageResponse> logout(@RequestBody RefreshTokenRequest request) {
+        authService.logout(request.getRefreshToken());
+        return new ResponseEntity<>(
+                new MessageResponse("Logout successful"),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/logout-all")
+    public ResponseEntity<MessageResponse> logoutAllDevices(Authentication authentication) {
+        String email = authentication.getName();
+        authService.logoutAllDevices(email);
+        return new ResponseEntity<>(
+                new MessageResponse("Logout successful"),
+                HttpStatus.OK
+        );
+    }
+
 }

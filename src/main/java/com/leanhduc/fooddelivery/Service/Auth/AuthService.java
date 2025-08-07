@@ -11,6 +11,7 @@ import com.leanhduc.fooddelivery.Response.AuthResponse;
 import com.leanhduc.fooddelivery.Response.GoogleTokenResponse;
 import com.leanhduc.fooddelivery.Response.GoogleUserInfoResponse;
 import com.leanhduc.fooddelivery.Service.Oauth2.GoogleService;
+import com.leanhduc.fooddelivery.Service.RefreshToken.RefreshTokenService;
 import com.leanhduc.fooddelivery.Service.SendEmail.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class AuthService implements IAuthService {
     private final GoogleService googleService;
     private final JwtTokenUtils jwtTokenUtils;
     private final CartRepository cartRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -131,9 +133,11 @@ public class AuthService implements IAuthService {
             );
 
             String jwtToken = jwtTokenUtils.generateToken(authentication);
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
 
             return new AuthResponse(
                     jwtToken,
+                    refreshToken.getToken(),
                     "Google authentication successful",
                     user.getRole()
             );
@@ -164,5 +168,30 @@ public class AuthService implements IAuthService {
         newUser.setCart(cart);
 
         return userRepository.save(newUser);
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse refreshAccessToken(String refreshToken) {
+        User user = refreshTokenService.verifyRefreshToken(refreshToken);
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken);
+        String authorities = user.getRole().toString();
+        String newAccessToken = jwtTokenUtils.generateAccessToken(user.getEmail(), authorities);
+
+        return new AuthResponse(
+                newAccessToken,
+                newRefreshToken.getToken(),
+                "Access token refreshed successfully",
+                user.getRole());
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+        refreshTokenService.revokeRefreshToken(refreshToken);
+    }
+
+    @Override
+    public void logoutAllDevices(String email) {
+        refreshTokenService.revokeAllTokensByUser(email);
     }
 }

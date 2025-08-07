@@ -5,10 +5,7 @@ import com.leanhduc.fooddelivery.Configuration.JwtTokenUtils;
 import com.leanhduc.fooddelivery.Exception.AlreadyExistsException;
 import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
 import com.leanhduc.fooddelivery.Exception.UnauthorizedAccessException;
-import com.leanhduc.fooddelivery.Model.Address;
-import com.leanhduc.fooddelivery.Model.Cart;
-import com.leanhduc.fooddelivery.Model.RoleUser;
-import com.leanhduc.fooddelivery.Model.User;
+import com.leanhduc.fooddelivery.Model.*;
 import com.leanhduc.fooddelivery.Repository.AddressRepository;
 import com.leanhduc.fooddelivery.Repository.CartRepository;
 import com.leanhduc.fooddelivery.Repository.UserRepository;
@@ -19,6 +16,7 @@ import com.leanhduc.fooddelivery.RequestDto.RegisterRequest;
 import com.leanhduc.fooddelivery.Response.AuthResponse;
 import com.leanhduc.fooddelivery.ResponseDto.OrderDto;
 import com.leanhduc.fooddelivery.ResponseDto.UserDto;
+import com.leanhduc.fooddelivery.Service.RefreshToken.IRefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -49,6 +47,7 @@ public class UserService implements IUserService {
     private final CartRepository cartRepository;
     private final AddressRepository addressRepository;
     private final ModelMapper modelMapper;
+    private final IRefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -72,21 +71,33 @@ public class UserService implements IUserService {
 
         Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtTokenUtils.generateToken(auth);
 
-        return new AuthResponse(token, "Register success", savedUser.getRole());
+        String accessToken = jwtTokenUtils.generateAccessToken(auth);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+        return new AuthResponse(
+                accessToken,
+                refreshToken.getToken(),
+                "Register success",
+                savedUser.getRole());
     }
 
     @Override
+    @Transactional
     public AuthResponse signIn(LoginRequest request) {
         String username = request.getEmail();
         String password = request.getPassword();
         Authentication authentication = authenticate(username, password);
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String roles = authorities.isEmpty() ? null : authorities.iterator().next().getAuthority();
-        String token = jwtTokenUtils.generateToken(authentication);
 
-        return new AuthResponse(token, "Login success", RoleUser.valueOf(roles));
+        String accessToken = jwtTokenUtils.generateAccessToken(authentication);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(username);
+
+        return new AuthResponse(
+                accessToken,
+                refreshToken.getToken(),
+                "Login success"
+                , RoleUser.valueOf(roles));
     }
 
     private Authentication authenticate(String username, String password) {
