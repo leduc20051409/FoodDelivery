@@ -11,6 +11,7 @@ import { addressReducer } from './Customer/Addresses/Reducer'
 import { persistReducer } from 'redux-persist'
 import persistStore from 'redux-persist/es/persistStore'
 import storage from 'redux-persist/lib/storage'
+import reviewReducer from './Customer/Reviews/Reducer'
 
 const persistConfig = {
   key: 'root',
@@ -26,7 +27,8 @@ const rooteReducer = combineReducers({
   order: orderReducer,
   ingredient: ingredientReducer,
   restaurantOrder: restaurantsOrderReducer,
-  addresses: addressReducer
+  addresses: addressReducer,
+  review: reviewReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rooteReducer);

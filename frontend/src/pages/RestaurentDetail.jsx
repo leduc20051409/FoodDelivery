@@ -9,16 +9,50 @@ import { getRestaurantById, getRestaurantsCategory } from '../State/Customer/Res
 import { getMenuItemsByRestaurantId, searchMenuItem } from '../State/Customer/Menu/Action';
 import SearchIcon from '@mui/icons-material/Search';
 import RestaurantSearch from '../components/RestaurantSearch';
+import { Tabs, Tab, Box } from '@mui/material';
+import ReviewItem from '../components/ReviewItem';
+import { getReviewsByRestaurant } from '../State/Customer/Reviews/Action';
+
+const sampleReviews = [
+    {
+        id: 1,
+        name: "Nguyễn Văn A",
+        rating: 5,
+        comment: "Đồ ăn rất ngon, phục vụ nhanh chóng. Sẽ quay lại!",
+        date: "2025-07-01"
+    },
+    {
+        id: 2,
+        name: "Trần Thị B",
+        rating: 4,
+        comment: "Không gian thoáng mát, món ăn khá hợp khẩu vị.",
+        date: "2025-07-05"
+    },
+    {
+        id: 3,
+        name: "Lê Văn C",
+        rating: 3,
+        comment: "Món ăn ổn nhưng phục vụ hơi chậm.",
+        date: "2025-07-10"
+    },
+    {
+        id: 4,
+        name: "Phạm Thị D",
+        rating: 5,
+        comment: "Tuyệt vời! Bánh pizza ngon nhất mà mình từng ăn.",
+        date: "2025-07-15"
+    },
+    {
+        id: 5,
+        name: "Hoàng Văn E",
+        rating: 4,
+        comment: "Giá cả hợp lý, chất lượng tốt.",
+        date: "2025-07-20"
+    }
+];
 
 
 const RestaurentDetail = () => {
-    const categories = [
-        "pizza",
-        "biryani",
-        "burger",
-        "chiken",
-        "rice"
-    ];
 
     const foodTypes = [
         { label: "All", value: "all" },
@@ -31,10 +65,16 @@ const RestaurentDetail = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("token");
-    const { auth, restaurant, menu } = useSelector(store => store);
+    const { auth, restaurant, menu, review } = useSelector(store => store);
     const { id, city } = useParams();
     const [selectedCategory, setSelectedCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [tabValue, setTabValue] = useState(0);
+
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
+
     const displayedMenuItems = menu.menuItems.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -45,11 +85,13 @@ const RestaurentDetail = () => {
 
     useEffect(() => {
         console.log("restaurant", restaurant);
+        console.log("review", review);
     }, []);
 
     useEffect(() => {
         dispatch(getRestaurantById({ restaurantId: id }));
         dispatch(getRestaurantsCategory({ restaurantId: id }));
+        dispatch(getReviewsByRestaurant(id));
     }, [id]);
 
     useEffect(() => {
@@ -118,59 +160,85 @@ const RestaurentDetail = () => {
             </section>
 
             <Divider />
-            <section className="pt-[2rem] lg:flex relative">
-                <div className="space-y-10 lg:w-[20%] filter p-5 shadow-md">
-                    <div className="box space-y-5 lg:sticky top-28 ">
-                        {/* Food Type */}
-                        <div>
-                            <Typography variant="h5" sx={{ paddingBottom: "1rem" }}>
-                                Food Type
-                            </Typography>
-                            <FormControl className="py-10 space-y-5" component={"fieldset"}>
-                                <RadioGroup onChange={(e) => setFoodType(e.target.value)} name="food_type" value={foodType}>
-                                    {foodTypes.map((item) => (
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="restaurant tabs">
+                    <Tab label="Menu" />
+                    <Tab label="Reviews" />
+                </Tabs>
+            </Box>
+
+            {tabValue === 0 && (
+                <section className="pt-[2rem] lg:flex relative">
+                    <div className="space-y-10 lg:w-[20%] filter p-5 shadow-md">
+                        <div className="box space-y-5 lg:sticky top-28 ">
+                            {/* Food Type */}
+                            <div>
+                                <Typography variant="h5" sx={{ paddingBottom: "1rem" }}>
+                                    Food Type
+                                </Typography>
+                                <FormControl className="py-10 space-y-5" component={"fieldset"}>
+                                    <RadioGroup onChange={(e) => setFoodType(e.target.value)} name="food_type" value={foodType}>
+                                        {foodTypes.map((item) => (
+                                            <FormControlLabel
+                                                key={item.value}
+                                                value={item.value}
+                                                control={<Radio />}
+                                                label={item.label}
+                                            />
+                                        ))}
+                                    </RadioGroup>
+                                </FormControl>
+                            </div>
+                            {/* Food Category */}
+                            <div>
+                                <Typography variant="h5" sx={{ paddingBottom: "1rem" }}>
+                                    Food Category
+                                </Typography>
+                                <FormControl className="py-10 space-y-5" component={"fieldset"}>
+                                    <RadioGroup onChange={handleFilterCategory} name="food_type" value={selectedCategory || "all"}>
                                         <FormControlLabel
-                                            key={item.value}
-                                            value={item.value}
+                                            value={"all"}
                                             control={<Radio />}
-                                            label={item.label}
+                                            label={"All"}
+                                            sx={{ color: "gray" }}
                                         />
-                                    ))}
-                                </RadioGroup>
-                            </FormControl>
-                        </div>
-                        {/* Food Category */}
-                        <div>
-                            <Typography variant="h5" sx={{ paddingBottom: "1rem" }}>
-                                Food Category
-                            </Typography>
-                            <FormControl className="py-10 space-y-5" component={"fieldset"}>
-                                <RadioGroup onChange={handleFilterCategory} name="food_type" value={selectedCategory || "all"}>
-                                    <FormControlLabel
-                                        value={"all"}
-                                        control={<Radio />}
-                                        label={"All"}
-                                        sx={{ color: "gray" }}
-                                    />
-                                    {restaurant.categories.map((item) => (
-                                        <FormControlLabel
-                                            key={item.id}
-                                            value={item.name}
-                                            control={<Radio />}
-                                            label={item.name}
-                                        />
-                                    ))}
-                                </RadioGroup>
-                            </FormControl>
+                                        {restaurant.categories.map((item) => (
+                                            <FormControlLabel
+                                                key={item.id}
+                                                value={item.name}
+                                                control={<Radio />}
+                                                label={item.name}
+                                            />
+                                        ))}
+                                    </RadioGroup>
+                                </FormControl>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="space-y-5 lg:w-[80%] lg:pl-10">
-                    {/* THAY ĐỔI: Thêm thanh tìm kiếm */}
-                    <RestaurantSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                    {displayedMenuItems.map((item, index) => <MenuCard item={item} key={index} />)}
-                </div>
-            </section>
+                    <div className="space-y-5 lg:w-[80%] lg:pl-10">
+                        {/* THAY ĐỔI: Thêm thanh tìm kiếm */}
+                        <RestaurantSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        {displayedMenuItems.map((item, index) => <MenuCard item={item} key={index} />)}
+                    </div>
+                </section>
+            )}
+            {tabValue === 1 && (
+                <section className="pt-[2rem]" style={{ minHeight: "70vh" }}>
+                    <Typography variant="h4" className="mb-4">Reviews</Typography>
+                    {/* Placeholder for reviews */}
+                    <div className="space-y-5">
+                        {review.restaurantReviews && review.restaurantReviews.length > 0 ? (
+                            review.restaurantReviews.map((review) => (
+                                <ReviewItem key={review.id} review={review} />
+                            ))
+                        ) : (
+                            <Typography variant="body1">No reviews available yet.</Typography>
+                        )}
+                    </div>
+
+
+                </section>
+            )}
 
         </div>
     )
