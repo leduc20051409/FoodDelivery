@@ -26,6 +26,7 @@ import java.util.Collections;
 public class AppConfig {
 
     private final JwtTokenValidator jwtTokenValidator;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -40,6 +41,7 @@ public class AppConfig {
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtTokenValidator, BasicAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .cors(cors -> cors.configurationSource(corsConfigSource()));
         return http.build();
     }

@@ -47,6 +47,11 @@ public class JwtTokenValidator extends OncePerRequestFilter {
         System.out.println("🚀 [JWT Filter] Incoming request to: " + request.getRequestURI());
         System.out.println("📦 [JWT Filter] Authorization Header: " + request.getHeader(JwtConstant.JWT_HEADER));
         System.out.println(secretKey);
+        if(request.getRequestURI().startsWith("/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (jwt != null && jwt.startsWith("Bearer ")) {
             jwt = jwt.substring(7);
             try {
@@ -71,8 +76,8 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
 
             } catch (Exception e) {
-                throw new BadCredentialsException("Invalid or expired token, you may login and try again!");
-
+                System.out.println("❌ [JWT Filter] Token validation failed: " + e.getMessage());
+                SecurityContextHolder.clearContext();
             }
         }
         filterChain.doFilter(request, response);
