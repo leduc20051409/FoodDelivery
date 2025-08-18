@@ -62,23 +62,6 @@ public class JwtTokenUtils {
                 .compact();
     }
 
-    public String generateToken(Authentication authentication) {
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String roles = populateAuthorities(authorities);
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", authentication.getName());
-        claims.put("authorization", roles);
-        claims.put("tokenType", "ACCESS");
-        return Jwts.builder()
-                .claims(claims)
-                .subject(authentication.getName())
-                .issuedAt(new Date())
-                .expiration((new Date(new Date().getTime() + 86400000)))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-
     public String getEmailFromToken(String token) {
         token = token.substring(7);
         Claims claims = Jwts.parser()

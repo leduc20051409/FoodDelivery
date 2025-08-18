@@ -32,7 +32,7 @@ public class RefreshTokenService implements IRefreshTokenService {
         refreshToken.setUser(user);
         refreshToken.setCreatedAt(Instant.now());
         refreshToken.setToken(tokenString);
-        refreshToken.setExpiryDate(Instant.now().plusSeconds(jwtTokenUtils.getRefreshTokenExpiration()));
+        refreshToken.setExpiryDate(Instant.now().plusMillis(jwtTokenUtils.getRefreshTokenExpiration()));
         refreshToken.setRevoked(false);
 
         cleanupOldTokensForUser(user);
@@ -103,7 +103,8 @@ public class RefreshTokenService implements IRefreshTokenService {
     }
 
     @Override
-    @Scheduled (cron = "0 0 2 * * ?")
+    @Transactional
+    //@Scheduled (cron = "0 0 2 * * ?")
     public void cleanupExpiredTokens() {
         refreshTokenRepository.deleteExpiredTokens(Instant.now());
     }

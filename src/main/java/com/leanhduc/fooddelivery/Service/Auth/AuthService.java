@@ -132,7 +132,7 @@ public class AuthService implements IAuthService {
                     Collections.singletonList(new SimpleGrantedAuthority(user.getRole().toString()))
             );
 
-            String jwtToken = jwtTokenUtils.generateToken(authentication);
+            String jwtToken = jwtTokenUtils.generateAccessToken(authentication);
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
 
             return new AuthResponse(
