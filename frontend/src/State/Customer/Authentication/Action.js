@@ -17,7 +17,7 @@ export const registerUser = (reqData) => async (dispatch) => {
         dispatch({ type: REGISTER_SUCCESS, payload: data.token });
         console.log("register success", data);
     } catch (error) {
-        dispatch({type: REGISTER_FAILURE, payload: error});
+        dispatch({ type: REGISTER_FAILURE, payload: error });
         console.log("error", error);
 
     }
@@ -26,7 +26,7 @@ export const registerUser = (reqData) => async (dispatch) => {
 export const loginUser = (reqData) => async (dispatch) => {
     dispatch({ type: LOGIN_REQUEST });
     try {
-        const { data } = await axios.post(`${API_URL}/auth/signin`, reqData.userData);
+        const { data } = await axios.post(`${API_URL}/auth/signin`, reqData.userData, { withCredentials: true });
         if (data.token) {
             localStorage.setItem("token", data.token);
             //dispatch(getUser(data.token));
@@ -39,7 +39,7 @@ export const loginUser = (reqData) => async (dispatch) => {
         dispatch({ type: LOGIN_SUCCESS, payload: data.token });
         console.log("login success", data);
     } catch (error) {
-        dispatch({type: LOGIN_FAILURE, payload: error});
+        dispatch({ type: LOGIN_FAILURE, payload: error });
         console.log("error", error);
     }
 }
@@ -63,7 +63,7 @@ export const getUser = (jwt) => async (dispatch) => {
 
 
 
-export const addToFavourite = ({restaurantId, jwt}) => async (dispatch) => {
+export const addToFavourite = ({ restaurantId, jwt }) => async (dispatch) => {
     dispatch({ type: ADD_TO_FAVOURITE_REQUEST });
     try {
         const { data } = await api.put(`/api/restaurants/restaurant/${restaurantId}/add-favourites`, {}, {
@@ -75,7 +75,7 @@ export const addToFavourite = ({restaurantId, jwt}) => async (dispatch) => {
         console.log("add to favourite", data);
 
     } catch (error) {
-        dispatch({type: ADD_TO_FAVOURITE_FAILURE, payload: error});
+        dispatch({ type: ADD_TO_FAVOURITE_FAILURE, payload: error });
         console.log("error", error);
     }
 }
@@ -90,7 +90,7 @@ export const forgotPassword = (reqData) => async (dispatch) => {
         console.log("error", error);
     }
 }
-export const resetPassword = ({token, newPassword}) => async (dispatch) => {
+export const resetPassword = ({ token, newPassword }) => async (dispatch) => {
     dispatch({ type: RESET_PASSWORD_REQUEST });
     try {
         const { data } = await api.post(`/auth/reset-password?token=${token}&newPassword=${newPassword}`);
@@ -104,12 +104,12 @@ export const resetPassword = ({token, newPassword}) => async (dispatch) => {
 
 export const loginWithGoogle = ({ code, redirectUri, navigate }) => async (dispatch) => {
     dispatch({ type: LOGIN_GOOGLE_REQUEST });
-    
+
     try {
         const { data } = await api.post(`/auth/google/callback`, {
             code,
             redirectUri,
-        });
+        }, { withCredentials: true });
 
         if (data.token) {
             localStorage.setItem("token", data.token);
@@ -129,14 +129,16 @@ export const loginWithGoogle = ({ code, redirectUri, navigate }) => async (dispa
 
 
 export const logOut = () => async (dispatch) => {
-    dispatch({ type: LOGOUT });
     try {
+        await api.post("/auth/logout");
         localStorage.clear();
         dispatch({ type: LOGOUT });
         console.log("log out success");
 
     } catch (error) {
         console.log("error", error);
+        localStorage.clear();
+        dispatch({ type: LOGOUT });
     }
 }
 

@@ -6,7 +6,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store, persistor } from './State/Store.js'
 import { PersistGate } from 'redux-persist/integration/react'
+import { injectStore } from './components/config/Api.js'
 
+injectStore(store);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
