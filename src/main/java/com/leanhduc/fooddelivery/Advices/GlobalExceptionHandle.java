@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +51,7 @@ public class GlobalExceptionHandle {
 
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<AuthResponse> handleUnauthorized(UnauthorizedAccessException ex) {
-        AuthResponse response = new AuthResponse(null, ex.getMessage(), null);
+        AuthResponse response = new AuthResponse(null,null, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 

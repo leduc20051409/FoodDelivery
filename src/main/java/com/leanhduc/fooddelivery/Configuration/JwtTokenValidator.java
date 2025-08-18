@@ -3,6 +3,7 @@ package com.leanhduc.fooddelivery.Configuration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,6 +18,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
@@ -38,13 +40,18 @@ public class JwtTokenValidator extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@Nonnull HttpServletRequest request,
+                                    @Nonnull HttpServletResponse response,
+                                    @Nonnull FilterChain filterChain) throws ServletException, IOException {
         String jwt = request.getHeader(JwtConstant.JWT_HEADER);
         System.out.println("🚀 [JWT Filter] Incoming request to: " + request.getRequestURI());
         System.out.println("📦 [JWT Filter] Authorization Header: " + request.getHeader(JwtConstant.JWT_HEADER));
         System.out.println(secretKey);
+        if(request.getRequestURI().startsWith("/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (jwt != null && jwt.startsWith("Bearer ")) {
             jwt = jwt.substring(7);
             try {
@@ -54,8 +61,12 @@ public class JwtTokenValidator extends OncePerRequestFilter {
                         .build()
                         .parseSignedClaims(jwt)
                         .getPayload();
+                String tokenType = String.valueOf(claims.get("tokenType"));
+                if(!tokenType.equals("ACCESS")) {
+                    throw new BadCredentialsException("Invalid token type, expected ACCESS token");
+                }
 
-                String email = String.valueOf(claims.get("email"));
+                String email = claims.getSubject();
                 String authorities = String.valueOf(claims.get("authorization"));
 
                 //Role customer, Admin
@@ -65,11 +76,19 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
 
             } catch (Exception e) {
-                throw new BadCredentialsException("Invalid or expired token, you may login and try again!");
-
+                System.out.println("❌ [JWT Filter] Token validation failed: " + e.getMessage());
+                SecurityContextHolder.clearContext();
             }
         }
         filterChain.doFilter(request, response);
 
+    }
+
+    private String extractJwtToken(HttpServletRequest request) {
+        String header = request.getHeader(JwtConstant.JWT_HEADER);
+        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
     }
 }

@@ -54,6 +54,8 @@ app:
 
 jwt:
   secretKey: ${JWT_SECRET_KEY}
+  accessTokenExpiration: 900
+  refreshTokenExpiration: 604800000
 
 stripe:
   api:
