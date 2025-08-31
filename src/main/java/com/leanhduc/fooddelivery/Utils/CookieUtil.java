@@ -1,4 +1,4 @@
-package com.leanhduc.fooddelivery.Configuration;
+package com.leanhduc.fooddelivery.Utils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
