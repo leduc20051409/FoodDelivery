@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import '../css/Home.css';
 import MultiItemCarousel from '../components/MultiItemCarousel';
 import RestaurantCard from '../components/RestaurantCard';
-import RestaurentDetail from './RestaurentDetail';
 import Auth from '../components/auth/Auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllRestaurantsAction } from '../State/Customer/Restaurant/Action';
-import { store } from '../State/Store';
 import { Pagination, Stack } from '@mui/material';
+import ReviewsSection from '../components/ReviewsSection';
+import Footer from '../components/Footer';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -83,7 +83,10 @@ const Home = () => {
             </section>
 
             <section className='px-5'>
-
+                <ReviewsSection />
+            </section>
+            <section className='pt-5'>
+                <Footer />
             </section>
             <Auth />
         </div>
