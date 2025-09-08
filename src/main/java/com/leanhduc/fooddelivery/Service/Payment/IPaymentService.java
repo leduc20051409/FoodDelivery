@@ -2,11 +2,10 @@ package com.leanhduc.fooddelivery.Service.Payment;
 
 import com.leanhduc.fooddelivery.Model.Order;
 import com.leanhduc.fooddelivery.Response.PaymentResponse;
-import com.stripe.exception.StripeException;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface IPaymentService {
-    PaymentResponse createPaymentLink(Order order) throws StripeException;
+    PaymentResponse createPaymentLink(Order order, HttpServletRequest request) throws Exception;
 
     void handleWebhook(String payload, String sigHeader);
 
