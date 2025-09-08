@@ -62,3 +62,17 @@ stripe:
     key: ${STRIPE_API_KEY}
   webhook:
     secret: ${STRIPE_WEBHOOK_SECRET}
+
+vnPay:
+  tmnCode: ${VNPAY_TMN_CODE}
+  hashSecret: ${VNPAY_HASH_SECRET}
+  payUrl: ${VNPAY_PAY_URL}
+  returnUrl: ${VNPAY_RETURN_URL}
+  command: ${VNPAY_COMMAND}
+  version: ${VNPAY_VERSION}
+  orderType: ${VNPAY_ORDER_TYPE}
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

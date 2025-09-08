@@ -1,13 +1,12 @@
 package com.leanhduc.fooddelivery.Service.RefreshToken;
 
-import com.leanhduc.fooddelivery.Configuration.JwtTokenUtils;
+import com.leanhduc.fooddelivery.Utils.JwtTokenUtils;
 import com.leanhduc.fooddelivery.Exception.UnauthorizedAccessException;
 import com.leanhduc.fooddelivery.Model.RefreshToken;
 import com.leanhduc.fooddelivery.Model.User;
 import com.leanhduc.fooddelivery.Repository.RefreshTokenRepository;
 import com.leanhduc.fooddelivery.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

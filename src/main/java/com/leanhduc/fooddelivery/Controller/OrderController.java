@@ -9,7 +9,9 @@ import com.leanhduc.fooddelivery.Response.PaymentResponse;
 import com.leanhduc.fooddelivery.ResponseDto.OrderDto;
 import com.leanhduc.fooddelivery.Service.Order.IOrderService;
 import com.leanhduc.fooddelivery.Service.Payment.IPaymentService;
+import com.leanhduc.fooddelivery.Service.Payment.PaymentServiceFactory;
 import com.leanhduc.fooddelivery.Service.User.IUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +25,10 @@ import java.util.List;
 public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;
-    private final IPaymentService paymentService;
+    private final PaymentServiceFactory paymentServiceFactory;
 
     @PostMapping("/order")
-    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest,
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest request,
                                          @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findByJwtToken(jwt);
         Order order = orderService.createOrder(orderRequest, user);
@@ -36,7 +38,8 @@ public class OrderController {
             return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
         } else {
             try {
-                PaymentResponse response = paymentService.createPaymentLink(order);
+                IPaymentService paymentService = paymentServiceFactory.getPaymentService(orderRequest.getPaymentMethod());
+                PaymentResponse response = paymentService.createPaymentLink(order, request );
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
             } catch (Exception e) {
                 orderService.handlePaymentFailure(order.getId());

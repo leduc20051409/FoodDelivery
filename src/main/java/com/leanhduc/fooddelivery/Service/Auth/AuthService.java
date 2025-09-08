@@ -1,6 +1,6 @@
 package com.leanhduc.fooddelivery.Service.Auth;
 
-import com.leanhduc.fooddelivery.Configuration.JwtTokenUtils;
+import com.leanhduc.fooddelivery.Utils.JwtTokenUtils;
 import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
 import com.leanhduc.fooddelivery.Exception.UnauthorizedAccessException;
 import com.leanhduc.fooddelivery.Model.*;

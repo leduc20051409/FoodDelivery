@@ -1,7 +1,7 @@
 package com.leanhduc.fooddelivery.Service.User;
 
 import com.leanhduc.fooddelivery.Configuration.CustomerUserDetailService;
-import com.leanhduc.fooddelivery.Configuration.JwtTokenUtils;
+import com.leanhduc.fooddelivery.Utils.JwtTokenUtils;
 import com.leanhduc.fooddelivery.Exception.AlreadyExistsException;
 import com.leanhduc.fooddelivery.Exception.ResourceNotFoundException;
 import com.leanhduc.fooddelivery.Exception.UnauthorizedAccessException;

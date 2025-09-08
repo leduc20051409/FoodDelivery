@@ -14,12 +14,12 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentService implements IPaymentService {
+public class StripePaymentService implements IPaymentService {
 
     @Value ("${stripe.api.key}")
     private String stripeSecretKey;
@@ -43,7 +43,7 @@ public class PaymentService implements IPaymentService {
 
 
     @Override
-    public PaymentResponse createPaymentLink(Order order) throws StripeException {
+    public PaymentResponse createPaymentLink(Order order, HttpServletRequest request) throws Exception {
         if (order == null || order.getId() == null) {
             throw new InvalidParamException("Invalid order provided");
         }
