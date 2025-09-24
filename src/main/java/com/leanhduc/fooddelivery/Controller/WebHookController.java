@@ -69,11 +69,11 @@ public class WebHookController {
 
         boolean success = (boolean) result.get("success");
         Long orderId = (Long) result.get("orderId");
+        String sessionId = request.getParameter("vnp_TxnRef");
         if (success) {
-            response.sendRedirect(frontendUrl + "/payment/success?orderId=" + orderId);
+            response.sendRedirect(frontendUrl + "/payment/success/" + sessionId);
         } else {
-            String message = (String) result.get("message");
-            response.sendRedirect(frontendUrl + "/payment/failed?orderId=" + orderId + "&message=" + message);
+            response.sendRedirect(frontendUrl + "/payment/cancel/" + sessionId);
         }
     }
 

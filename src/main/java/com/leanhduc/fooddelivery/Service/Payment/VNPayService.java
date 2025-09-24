@@ -11,6 +11,7 @@ import com.leanhduc.fooddelivery.Response.PaymentResponse;
 import com.leanhduc.fooddelivery.Service.Order.IOrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VNPayService implements IPaymentService {
 
     private final VnPayConfig vnPayConfig;
@@ -38,13 +40,20 @@ public class VNPayService implements IPaymentService {
         String vnp_IpAddr = VNPayUtil.getIpAddress(request);
         long amount = Math.round(order.getTotalPrice());
 
-        Map<String, String> vnpParams = vnPayConfig.getVNPayConfig(vnp_TxnRef, amount, vnp_IpAddr);
+        Map<String, String> vnpParams = vnPayConfig.getVNPayConfig();
+        vnpParams.put("vnp_Amount", String.valueOf(amount * 100));
+        vnpParams.put("vnp_TxnRef", vnp_TxnRef);
+        vnpParams.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnpParams.put("vnp_IpAddr", vnp_IpAddr);
 
         String queryUrl = VNPayUtil.createPaymentUrl(vnpParams, true);
         String hashData = VNPayUtil.createPaymentUrl(vnpParams, false);
         String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
         queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
         String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+
+        log.info("Payment URL: {}", paymentUrl);
+        log.info("VNP_TxnRef: {}", vnp_TxnRef);
 
         order.setPaymentTransactionId(vnp_TxnRef);
         order.setPaymentStatus(PaymentStatus.PROCESSING);
