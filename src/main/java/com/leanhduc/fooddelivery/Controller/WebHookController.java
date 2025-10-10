@@ -76,23 +76,4 @@ public class WebHookController {
             response.sendRedirect(frontendUrl + "/payment/cancel/" + sessionId);
         }
     }
-
-    @GetMapping("/status/{paymentMethod}/{transactionId}")
-    public ResponseEntity<?> checkPaymentStatus(
-            @PathVariable String paymentMethod,
-            @PathVariable String transactionId,
-            @RequestHeader("Authorization") String jwt) {
-        PaymentMethod method = PaymentMethod.valueOf(paymentMethod.toUpperCase());
-        IPaymentService paymentService = paymentServiceFactory.getPaymentService(method);
-
-        boolean isCompleted = paymentService.verifyPaymentStatus(transactionId);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("transactionId", transactionId);
-        response.put("completed", isCompleted);
-        response.put("status", isCompleted ? "COMPLETED" : "PENDING");
-        response.put("paymentMethod", method);
-
-        return ResponseEntity.ok(response);
-    }
 }

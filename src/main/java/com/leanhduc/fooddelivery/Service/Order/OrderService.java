@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class OrderService implements IOrderService {
     private String stripeSecretKey;
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Order createOrder(OrderRequest orderRequest, User user) {
         Cart cart = cartService.findCartByUserId(user.getId());
         Restaurant restaurant = restaurantService.getRestaurantById(orderRequest.getRestaurantId());

@@ -68,33 +68,6 @@ public class VNPayService implements IPaymentService {
 
     @Override
     public void handleWebhook(String payload, String sigHeader) {
-        Map<String, String> vnpParams = parseVnPayResponse(payload);
-        if(isInvalidSignature(vnpParams)) {
-            throw new InvalidParamException("Invalid VNPay signature");
-        }
-        String vnp_TxnRef = vnpParams.get("vnp_TxnRef");
-        String vnp_ResponseCode = vnpParams.get("vnp_ResponseCode");
-        String vnp_TransactionStatus = vnpParams.get("vnp_TransactionStatus");
-
-        String orderIdStr = vnp_TxnRef.split("_")[0];
-        Long orderId = Long.parseLong(orderIdStr);
-        Order order = orderService.getOrderById(orderId);
-
-        if(!vnp_TxnRef.equals(order.getPaymentTransactionId())) {
-            return;
-        }
-        if ("00".equals(vnp_ResponseCode) && "00".equals(vnp_TransactionStatus)) {
-            order.setPaymentStatus(PaymentStatus.COMPLETED);
-            order.setPaymentDate(new Date());
-            order.setOrderStatus(OrderStatus.CONFIRMED);
-            order.setUpdatedAt(new Date());
-        } else {
-            order.setPaymentStatus(PaymentStatus.FAILED);
-            order.setOrderStatus(OrderStatus.CANCELLED);
-            order.setCancelledAt(new Date());
-            order.setUpdatedAt(new Date());
-        }
-        orderRepository.save(order);
     }
 
     @Override
@@ -177,20 +150,6 @@ public class VNPayService implements IPaymentService {
         String calculatedHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
 
         return !calculatedHash.equalsIgnoreCase(vnp_SecureHash);
-    }
-
-    private Map<String, String> parseVnPayResponse(String payload) {
-        Map<String, String> params = new HashMap<>();
-        String[] pairs = payload.split("&");
-
-        for (String pair : pairs) {
-            String[] keyValue = pair.split("=");
-            if (keyValue.length == 2) {
-                params.put(keyValue[0], keyValue[1]);
-            }
-        }
-
-        return params;
     }
 
     private String getResponseMessage(String responseCode) {
