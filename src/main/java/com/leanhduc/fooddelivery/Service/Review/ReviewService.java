@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,9 +145,8 @@ public class ReviewService implements IReviewService {
 
     @Override
     public ReviewDto getReviewByOrderId(Long orderId, Long userId) {
-        Review review = reviewRepository.findByOrderIdAndCustomerId(orderId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-        return conversionToDto(review);
+        Optional<Review> review = reviewRepository.findByOrderIdAndCustomerId(orderId, userId);
+        return review.map(this::conversionToDto).orElse(null);
     }
 
     @Override
