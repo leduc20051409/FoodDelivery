@@ -6,6 +6,7 @@ import com.leanhduc.fooddelivery.Model.Food;
 import com.leanhduc.fooddelivery.Model.Restaurant;
 import com.leanhduc.fooddelivery.Repository.FoodRepository;
 import com.leanhduc.fooddelivery.RequestDto.FoodRequest;
+import com.leanhduc.fooddelivery.Service.Redis.Food.IFoodRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FoodService implements IFoodService {
     private final FoodRepository foodRepository;
+    private final IFoodRedisService foodRedisService;
 
     @Override
     public Food createFood(FoodRequest food, Category category, Restaurant restaurant) {
@@ -32,6 +34,8 @@ public class FoodService implements IFoodService {
 
         Food saveFood = foodRepository.save(newFood);
         restaurant.getFoods().add(saveFood);
+
+        foodRedisService.deleteFoodCacheByRestaurant(restaurant.getId());
         return saveFood;
     }
 
@@ -39,14 +43,26 @@ public class FoodService implements IFoodService {
     public void deleteFood(Long foodId) {
         Food food = foodRepository.findById(foodId)
                 .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + foodId));
+        Long restaurantId = food.getRestaurant() != null ? food.getRestaurant().getId() : null;
         food.setRestaurant(null);
         foodRepository.save(food);
+        if (restaurantId != null) {
+            foodRedisService.deleteFoodCacheByRestaurant(restaurantId);
+        }
     }
 
     @Override
     public List<Food> getRestaurantsFood(Long restaurantId, boolean isVegetarian, boolean isNonVegetarian, boolean isSeasonal, String foodCategory) {
 
-        List<Food> foods = foodRepository.findByRestaurantId(restaurantId);
+        List<Food> foods;
+        foods = foodRedisService.getFoodByRestaurant(restaurantId);
+        if (foods == null) {
+            foods = foodRepository.findByRestaurantId(restaurantId);
+            if (foods != null && !foods.isEmpty()) {
+                foodRedisService.saveFoodByRestaurant(restaurantId, foods);
+            }
+        }
+
         if (isVegetarian) {
             foods = filterByVegetarian(foods, isVegetarian);
         }
@@ -109,6 +125,9 @@ public class FoodService implements IFoodService {
         Food food = findFoodById(foodId);
         if (food != null) {
             food.setAvailable(!food.isAvailable());
+            if (food.getRestaurant() != null) {
+                foodRedisService.deleteFoodCacheByRestaurant(food.getRestaurant().getId());
+            }
             return foodRepository.save(food);
         }
         return null;
