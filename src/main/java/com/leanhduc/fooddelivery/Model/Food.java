@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString (exclude = {"user"})
+@ToString (exclude = {"ingredientItems"})
 public class Food {
 
     @Id
