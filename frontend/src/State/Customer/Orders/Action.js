@@ -1,5 +1,6 @@
 
 import { api } from "../../../components/config/Api";
+import { PAYMENT_METHODS, PaymentServiceFactory } from "../../../services";
 import { PaymentService } from "../../../services/PaymentService";
 import { CANCEL_ORDER_FAILURE, CANCEL_ORDER_REQUEST, CANCEL_ORDER_SUCCESS, CREATE_ORDER_FAILURE, CREATE_ORDER_REQUEST, CREATE_ORDER_SUCCESS, GET_USERS_NOTIFICATION_REQUEST, GET_USERS_ORDERS_FAILURE, GET_USERS_ORDERS_REQUEST, GET_USERS_ORDERS_SUCCESS } from "./ActionType";
 import { GET_USERS_NOTIFICATION_FAILURE, GET_USERS_NOTIFICATION_SUCCESS } from "./ActionType";
@@ -15,21 +16,18 @@ export const createOrder = (reqData) => {
                 },
             });
             const paymentMethod = reqData.order.paymentMethod;
-            if (paymentMethod === 'CASH_ON_DELIVERY') {
+            if (paymentMethod === PAYMENT_METHODS.COD) {
                 dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
                 if (reqData.navigate) {
                     reqData.navigate('/my-profile/orders', { state: { order: data } });
                 }
             } else {
                 const paymentUrl = data.payment_url || data.payment_link_url || data.paymentUrl;
-
                 if (paymentUrl) {
-                    PaymentService.redirectToPayment(paymentUrl);
+                    window.location.href = paymentUrl;
                 } else {
-                    console.error('Payment URL not found in response');
                     throw new Error('Payment URL not found in response');
                 }
-                console.log("created order data", data)
                 dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
             }
         } catch (error) {
