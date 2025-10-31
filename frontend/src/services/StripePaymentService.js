@@ -45,13 +45,5 @@ export class StripePaymentService extends BasePaymentService {
     return this.extractSessionIdFromUrl();
   }
 
-  /**
-   * Check Stripe payment status
-   * @param {string} sessionId - Stripe session ID
-   * @param {string} token - JWT token
-   * @returns {Promise<Object>} Payment status
-   */
-  static async checkStripeStatus(sessionId, token) {
-    return await this.checkPaymentStatus('STRIPE_PAY', sessionId, token);
-  }
+
 }

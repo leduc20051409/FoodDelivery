@@ -77,52 +77,5 @@ export class VNPayService extends BasePaymentService {
     }
   }
 
-  /**
-   * Check VNPay payment status
-   * @param {string} transactionId - VNPay transaction ID
-   * @param {string} token - JWT token
-   * @returns {Promise<Object>} Payment status
-   */
-  static async checkVNPayStatus(transactionId, token) {
-    return await this.checkPaymentStatus('VN_PAY', transactionId, token);
-  }
-
-  /**
-   * Poll VNPay payment status until completion
-   * @param {string} transactionId - Transaction ID
-   * @param {string} token - JWT token
-   * @param {Object} options - Polling options
-   * @returns {Promise<Object>} Final payment status
-   */
-  static async pollVNPayStatus(transactionId, token, options = {}) {
-    const { 
-      maxAttempts = 10, 
-      interval = 3000, 
-      onStatusUpdate 
-    } = options;
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        const status = await this.checkVNPayStatus(transactionId, token);
-        
-        onStatusUpdate && onStatusUpdate(status, attempt);
-        
-        if (status.completed) {
-          return status;
-        }
-        
-        if (attempt < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, interval));
-        }
-      } catch (error) {
-        console.error(`VNPay status check attempt ${attempt} failed:`, error);
-        
-        if (attempt === maxAttempts) {
-          throw error;
-        }
-      }
-    }
-    
-    throw new Error('VNPay payment status polling timeout');
-  }
+  
 }

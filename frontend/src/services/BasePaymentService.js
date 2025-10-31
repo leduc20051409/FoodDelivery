@@ -43,27 +43,7 @@ export class BasePaymentService {
     }
   }
 
-  /**
-   * Check payment status by payment method and transaction ID
-   * @param {string} paymentMethod - 'VN_PAY' or 'STRIPE_PAY'
-   * @param {string} transactionId - Transaction ID
-   * @param {string} token - JWT token
-   * @returns {Promise<Object>} Payment status
-   */
-  static async checkPaymentStatus(paymentMethod, transactionId, token) {
-    try {
-      const response = await api.get(`/api/webhooks/status/${paymentMethod}/${transactionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Payment status check failed:', error);
-      throw error;
-    }
-  }
-
+  
   /**
    * Redirect to payment page (works for both Stripe and VNPay)
    * @param {string} paymentUrl - Payment URL

@@ -48,17 +48,7 @@ export class PaymentServiceFactory {
     return await service.verifyPayment(sessionId, token);
   }
 
-  /**
-   * Check status for any payment method
-   * @param {string} paymentMethod - Payment method
-   * @param {string} transactionId - Transaction ID
-   * @param {string} token - JWT token
-   * @returns {Promise<Object>} Payment status
-   */
-  static async checkPaymentStatus(paymentMethod, transactionId, token) {
-    const service = this.getPaymentService(paymentMethod);
-    return await service.checkPaymentStatus(paymentMethod, transactionId, token);
-  }
+
 }
 
 // Export supported payment methods
