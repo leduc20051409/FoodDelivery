@@ -50,7 +50,7 @@ public class AppConfig {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
             config.setAllowedOrigins(Arrays.asList(
-                    "https://zosh-food.vercel.app/",
+                    "https://duc-food.vercel.app",
                     "http://localhost:5173"
             ));
             config.setAllowedMethods(Collections.singletonList("*"));
