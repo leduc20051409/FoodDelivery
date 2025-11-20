@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LOGIN_SUCCESS, LOGOUT } from "../../State/Customer/Authentication/ActionType";
 
-export const API_URL = "http://localhost:8080";
+export const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 let store;
 export const injectStore = (_store) => {
