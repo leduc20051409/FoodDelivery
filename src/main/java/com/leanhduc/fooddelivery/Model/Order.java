@@ -15,7 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = {"customer", "restaurant", "items", "deliveryAddress"})
-@Table (name = "orders")
+@Table(name = "orders", indexes = {
+        @Index(name = "idx_orders_customer_id", columnList = "customer_id"),
+        @Index(name = "idx_orders_restaurant_id", columnList = "restaurant_id"),
+        @Index(name = "idx_orders_delivery_address_id", columnList = "delivery_address_id"),
+        @Index(name = "idx_orders_status", columnList = "order_status")
+})
 public class Order {
 
     @Id

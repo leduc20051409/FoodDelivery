@@ -133,6 +133,11 @@ public class StripePaymentService implements IPaymentService {
             Long orderId = Long.parseLong(orderIdStr);
             Order order = orderService.getOrderById(orderId);
 
+            if (order.getPaymentStatus() == PaymentStatus.COMPLETED) {
+                log.info("Order {} already marked as COMPLETED. Skipping duplicate Stripe webhook.", orderId);
+                return;
+            }
+
             if (!session.getId().equals(order.getPaymentTransactionId())) {
                 log.error("Session ID mismatch for order: {}", orderId);
                 return;
