@@ -109,6 +109,14 @@ public class VNPayService implements IPaymentService {
 
         Order order = orderService.getOrderById(orderId);
 
+        if (order.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            log.info("Order {} already marked as COMPLETED. Skipping duplicate VNPay return processing.", orderId);
+            result.put("success", true);
+            result.put("message", "Payment already processed successfully");
+            result.put("orderId", orderId);
+            return result;
+        }
+
         long expectedAmount = Math.round(order.getTotalPrice() * 100);
         long receivedAmount = Long.parseLong(vnp_Amount);
 
